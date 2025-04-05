@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 
+from data import db_session
+
 app = Flask(__name__)
 
 
@@ -9,6 +11,7 @@ def index():
 
 
 def main():
+    db_session.global_init('db/ed_in_py.sqlite')
     app.run()
 
 
