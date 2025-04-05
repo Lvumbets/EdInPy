@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect
 from forms.student import RegisterStudent, LoginStudent
 
+from data import db_session
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 
@@ -57,6 +59,7 @@ def login():
 
 
 def main():
+    db_session.global_init('db/ed_in_py.sqlite')
     app.run()
 
 
