@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from forms.student import RegisterStudent, LoginStudent
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
+
 
 @app.route('/')
 def index():
@@ -31,11 +32,29 @@ def register():
         #     speciality=form.speciality.data,
         #     address=form.address.data
         # )
-        #user.set_password(form.password.data)
-        #db_sess.add(user)
-        #db_sess.commit()
-        # return redirect('/login')
+        # user.set_password(form.password.data)
+        # db_sess.add(user)
+        # db_sess.commit()
+        return redirect('/login')
     return render_template('register_student.html', title='Регистрация ученика', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginStudent()
+    if form.validate_on_submit():
+        # Проверка на ученика в бд
+        # db_sess = db_session.create_session()
+        # user = db_sess.query(User).filter(User.email == form.email.data).first()
+        # if user and user.check_password(form.password.data):
+        #    login_user(user, remember=form.remember_me.data)
+        #    return redirect("/")
+        # return render_template('login.html',
+        #                       message="Неправильный логин или пароль",
+        #                       form=form)
+        return redirect("/") # временно
+    return render_template('login_student.html', title='Авторизация ученика', form=form)
+
 
 def main():
     app.run()
