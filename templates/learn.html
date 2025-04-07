@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block content %}
+<form>
+  <header>
+    <h1>{{ learn.title }}</h1>
+  </header>
+  <div>
+    <div><p>{{learn.condition}}</p></div>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Входные данные</th>
+            <th>Выходные данные</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for example in examples %}
+          <tr>
+            <td>
+              {% for i in example[0].split(',') %}
+              <p>{{i}}</p>
+              {% endfor %}
+            </td>
+            <td>
+                {% for i in example[1].split(',') %}
+                <p>{{i}}</p>
+                {% endfor %}
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <br />
+    <div>{{ form.code(cols=100, rows=10) }}</div>
+    <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+  </div>
+</form>
+{% endblock %}

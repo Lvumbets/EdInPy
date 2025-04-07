@@ -1,4 +1,7 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, abort, request
+
+from EdInPy.data.learns import Learn
+from EdInPy.forms.learn import LearnForm
 from forms.student import RegisterStudent, LoginStudent
 
 from data import db_session
@@ -54,8 +57,24 @@ def login():
         # return render_template('login.html',
         #                       message="Неправильный логин или пароль",
         #                       form=form)
-        return redirect("/") # временно
+        return redirect("/")  # временно
     return render_template('login_student.html', title='Авторизация ученика', form=form)
+
+
+@app.route("/learns/<int:learn_id>", methods=['GET', 'POST'])
+def show_learn(learn_id):
+    '''Страница с уроком'''
+    db_sess = db_session.create_session()
+    learn = db_sess.query(Learn).filter(Learn.id == learn_id).first()
+    if learn:  # если урок найден
+        learn_form = LearnForm()  # создание python формы
+        examples = [example.split(':') for example in str(learn.examples).split(';')]  # форматирование примеров
+
+        # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в уроке
+        # if learn_form.validate_on_submit():
+        #    return redirect('/')
+        return render_template('learn.html', form=learn_form, title='Название урока', learn=learn, examples=examples)
+    return abort(404)  # урок не найден
 
 
 def main():

@@ -8,6 +8,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
+    '''SQL база данных для учеников'''
     __tablename__ = 'students'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
