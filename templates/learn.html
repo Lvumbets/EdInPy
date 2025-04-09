@@ -1,10 +1,10 @@
 {% extends "base.html" %} {% block content %}
-<form>
+<form action="" method="post">
   <header>
     <h1>{{ learn.title }}</h1>
   </header>
   <div>
-    <div><p>{{learn.condition}}</p></div>
+    <div><p>{{ learn.condition }}</p></div>
     <div>
       <table>
         <thead>
@@ -31,7 +31,7 @@
         </tbody>
       </table>
     </div>
-    <br/>
+    <br />
     <div>{{ form.code(cols=100, rows=10) }}</div>
     <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
   </div>

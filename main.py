@@ -76,16 +76,15 @@ def show_learn(learn_id):
         examples = [example.split(':') for example in str(learn.examples).split(';')]  # форматирование примеров
 
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в уроке
-        # if learn_form.validate_on_submit():
-        #    return redirect('/')
+        if learn_form.submit.data:
+            return redirect('/learns')
         return render_template('learn.html', form=learn_form, title='Название урока', learn=learn, examples=examples)
     return abort(404)  # урок не найден
 
 
-@app.route('/lessons')
-def lessons():
-    return render_template('lessons.html')
-
+@app.route('/learns')
+def learns():
+    return render_template('learns.html')
 
 
 @app.route('/logout')
