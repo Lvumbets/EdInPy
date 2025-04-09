@@ -82,6 +82,12 @@ def show_learn(learn_id):
     return abort(404)  # урок не найден
 
 
+@app.route('/lessons')
+def lessons():
+    return render_template('lessons.html')
+
+
+
 @app.route('/logout')
 @login_required
 def logout():
