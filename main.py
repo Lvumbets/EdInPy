@@ -4,8 +4,8 @@ from flask import Flask, render_template, redirect, make_response, jsonify
 from flask import abort
 from flask_login import LoginManager, login_user, login_required, logout_user
 
-from EdInPy.data.learns import Learn
-from EdInPy.forms.learn import LearnForm
+from EdInPy.data.lessons import Lesson
+from EdInPy.forms.lesson import LessonForm
 from data import db_session
 from data.students import Student
 from forms.student import RegisterStudent, LoginStudent
@@ -61,30 +61,31 @@ def login():
         user = db_sess.query(Student).filter(Student.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            return redirect("/lessons")
         return render_template('login_student.html', form=form, message="Неправильный логин или пароль")
     return render_template('login_student.html', title='Авторизация ученика', form=form)
 
 
-@app.route("/learns/<int:learn_id>", methods=['GET', 'POST'])
-def show_learn(learn_id):
+@app.route("/lessons/<int:lesson_id>", methods=['GET', 'POST'])
+def show_lesson(lesson_id):
     '''Страница с уроком'''
     db_sess = db_session.create_session()
-    learn = db_sess.query(Learn).filter(Learn.id == learn_id).first()
-    if learn:  # если урок найден
-        learn_form = LearnForm()  # создание python формы
-        examples = [example.split(':') for example in str(learn.examples).split(';')]  # форматирование примеров
+    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if lesson:  # если урок найден
+        lesson_form = LessonForm()  # создание python формы
+        examples = [example.split(':') for example in str(lesson.examples).split(';')]  # форматирование примеров
 
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в уроке
-        if learn_form.submit.data:
-            return redirect('/learns')
-        return render_template('learn.html', form=learn_form, title='Название урока', learn=learn, examples=examples)
+        if lesson_form.submit.data:
+            return redirect('/lessons')
+        return render_template('lesson.html', form=lesson_form, title='Название урока', lesson=lesson,
+                               examples=examples)
     return abort(404)  # урок не найден
 
 
-@app.route('/learns')
-def learns():
-    return render_template('learns.html')
+@app.route('/lessons')
+def lessons():
+    return render_template('lessons.html')
 
 
 @app.route('/logout')

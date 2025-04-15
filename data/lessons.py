@@ -5,9 +5,9 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Learn(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
     '''SQL база данных уроков'''
-    __tablename__ = 'learns'
+    __tablename__ = 'lessons'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 

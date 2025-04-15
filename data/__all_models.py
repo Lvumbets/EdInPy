@@ -1,2 +1,2 @@
 from . import students
-from . import learns
+from . import lessons
