@@ -1,10 +1,16 @@
 {% extends "base.html" %} {% block content %}
 <form>
     <h1>Уроки</h1>
-    <div class="grid text-center">
-        <a href="lessons/1" type="button" class="btn btn-success">Python 1. Введение</a>
-        <a href="lessons/2" type="button" class="btn btn-success">Python 2. Условный оператор</a>
-        <a href="lessons/3" type="button" class="btn btn-success">Python 3. Знакомство с циклами</a>
+    <div class="grid text-center" style="display: flex">
+        <a href="lessons/1" type="button" class="btn btn-outline-secondary" style="width: 20em; height: 20em;margin-right: 50px;font-weight: bold;display: flex;
+  align-items: center;
+  justify-content: center;">Python 1. Введение</a>
+        <a href="lessons/2" type="button" class="btn btn-outline-secondary" style="width: 20em; height: 20em;margin-right: 50px;font-weight: bold;display: flex;
+  align-items: center;
+  justify-content: center;">Python 2. Условный оператор</a>
+        <a href="lessons/3" type="button" class="btn btn-outline-secondary" style="width: 20em; height: 20em;margin-right: 50px;font-weight: bold;display: flex;
+  align-items: center;
+  justify-content: center;">Python 3. Знакомство с циклами</a>
     </div>
 </form>
 {% endblock %}

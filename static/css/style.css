@@ -27,6 +27,10 @@ form.lessons {
 button {
     color: #fff;
     background-color: #73A353;
-    width: 3em;
-    height: 5em
+    width: 10em;
+    height: 20em;
+    --bs-btn-padding-y: .100rem;
+    --bs-btn-padding-x: .5rem;
+    --bs-btn-font-size: .75rem;
+
 }
