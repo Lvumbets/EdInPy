@@ -6,10 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db_session import SqlAlchemyBase
 
-
-class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
     '''SQL база данных для учеников'''
-    __tablename__ = 'students'
+    __tablename__ = 'teachers'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 
@@ -20,13 +19,14 @@ class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
 
+    students = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
+
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
-    teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teachers.id"))
-    teacher = orm.relationship('Teacher')
+    student = orm.relationship("Student", back_populates='teacher')
 
     def __repr__(self):
-        return '{surname} {name}'.format(surname=self.surname, name=self.name)
+        return '{surname} {name} is teacher'.format(surname=self.surname, name=self.name)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
