@@ -4,8 +4,8 @@ from flask import Flask, render_template, redirect, make_response, jsonify
 from flask import abort
 from flask_login import LoginManager, login_user, login_required, logout_user
 
-from EdInPy.data.lessons import Lesson
-from EdInPy.forms.lesson import LessonForm
+from data.lessons import Lesson
+from forms.lesson import LessonForm
 from data import db_session
 from data.students import Student
 from forms.student import RegisterStudent, LoginStudent
