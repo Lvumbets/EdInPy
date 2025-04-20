@@ -28,8 +28,8 @@ def index():
     return render_template('base.html', title='Шаблон')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
+@app.route('/register_student', methods=['GET', 'POST'])
+def register_sudent():
     form = RegisterStudent()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -49,12 +49,12 @@ def register():
         student.set_password(form.password.data)
         db_sess.add(student)
         db_sess.commit()
-        return redirect('/login')
+        return redirect('/login_student')
     return render_template('register_student.html', title='Регистрация ученика', form=form)
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/login_student', methods=['GET', 'POST'])
+def login_student():
     form = LoginStudent()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
