@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .db_session import SqlAlchemyBase
 
 class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
-    '''SQL база данных для учеников'''
+    '''SQL база данных для учителей'''
     __tablename__ = 'teachers'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -23,7 +23,7 @@ class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
-    student = orm.relationship("Student", back_populates='teacher')
+    student = orm.relationship("Student")
 
     def __repr__(self):
         return '{surname} {name} is teacher'.format(surname=self.surname, name=self.name)

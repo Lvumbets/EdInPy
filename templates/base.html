@@ -15,7 +15,7 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
     <nav class="navbar navbar-light bg-light d-flex bd-highlight mb-3">
-        <a class="navbar-brand me-auto p-1 bd-highlight" href="#"><h2>Education In Python</h2></a>
+        <a class="navbar-brand me-auto p-1 bd-highlight" href="/"><h2>Education In Python</h2></a>
         {% if current_user.is_authenticated %}
         <a class="navbar-brand p-1 bd-highlight" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
         {% else %}
@@ -26,8 +26,8 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                 <li><a class="dropdown-item" href="register_student">Как ученик</a></li>
-                <li><a class="dropdown-item" href="#">Как учитель</a></li>
-                <li><a class="dropdown-item" href="#">Как администратор</a></li>
+                <li><a class="dropdown-item" href="register_teacher">Как учитель</a></li>
+                <li><a class="dropdown-item" href="register_admin">Как администратор</a></li>
             </ul>
         </div>
         <div class="dropdown p-2 bd-highlight">
@@ -37,8 +37,8 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
                 <li><a class="dropdown-item" href="login_student">Как ученик</a></li>
-                <li><a class="dropdown-item" href="#">Как учитель</a></li>
-                <li><a class="dropdown-item" href="#">Как администратор</a></li>
+                <li><a class="dropdown-item" href="login_teacher">Как учитель</a></li>
+                <li><a class="dropdown-item" href="login_admin">Как администратор</a></li>
             </ul>
         </div>
         {% endif %}
