@@ -18,11 +18,14 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 
+table_now = None
+
 
 @login_manager.user_loader
 def load_user(id):
+    global table_now
     db_sess = db_session.create_session()
-    return db_sess.query(Student).get(id)  # проблема - логинит только людей из учеников, а не в зависимости от роли
+    return db_sess.query(table_now).get(id)
 
 
 @app.route('/')
@@ -56,11 +59,13 @@ def register_student():
 
 @app.route('/login_student', methods=['GET', 'POST'])
 def login_student():
+    global table_now
     form = LoginStudent()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         student = db_sess.query(Student).filter(Student.email == form.email.data).first()
         if student and student.check_password(form.password.data):
+            table_now = Student
             login_user(student, remember=form.remember_me.data)
             return redirect("/lessons")
         return render_template('login_student.html', form=form, message="Неправильный логин или пароль")
@@ -102,13 +107,16 @@ def register_teacher():
 
 @app.route('/login_teacher', methods=['GET', 'POST'])
 def login_teacher():
+    '''Функция логина учителя'''
+    global table_now  # переменная с таблицей, из которой надо логинить юзера в сессии
     form = LoginTeacher()
-    if form.validate_on_submit():
+    if form.validate_on_submit():  # при нажатии на кнопку
         db_sess = db_session.create_session()
         teacher = db_sess.query(Teacher).filter(Teacher.email == form.email.data).first()
-        if teacher and teacher.check_password(form.password.data):
+        if teacher and teacher.check_password(form.password.data):  # если учитель найден - логинимся
+            table_now = Teacher
             login_user(teacher, remember=form.remember_me.data)
-            return redirect("/lessons")
+            return redirect("/lessons")  # переходим на страницу уроков
         return render_template('login_teacher.html', form=form, message="Неправильный логин или пароль")
     return render_template('login_teacher.html', title='Авторизация учителя', form=form)
 
