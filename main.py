@@ -4,13 +4,15 @@ from flask import Flask, render_template, redirect, make_response, jsonify
 from flask import abort
 from flask_login import LoginManager, login_user, login_required, logout_user
 
-from EdInPy.forms.teacher import RegisterTeacher, LoginTeacher
 from data import db_session
+from data.admins import Admin
 from data.lessons import Lesson
 from data.students import Student
 from data.teachers import Teacher
+from forms.admin import LoginAdmin
 from forms.lesson import LessonForm
 from forms.student import RegisterStudent, LoginStudent
+from forms.teacher import RegisterTeacher, LoginTeacher
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -119,6 +121,22 @@ def login_teacher():
             return redirect("/lessons")  # переходим на страницу уроков
         return render_template('login_teacher.html', form=form, message="Неправильный логин или пароль")
     return render_template('login_teacher.html', title='Авторизация учителя', form=form)
+
+
+@app.route('/login_admin', methods=['GET', 'POST'])
+def login_admin():
+    '''Функция логина администратора'''
+    global table_now  # переменная с таблицей, из которой надо логинить юзера в сессии
+    form = LoginAdmin()
+    if form.validate_on_submit():  # при нажатии на кнопку
+        db_sess = db_session.create_session()
+        admin = db_sess.query(Admin).filter(Admin.email == form.email.data).first()
+        if admin and admin.check_password(form.password.data):  # если учитель найден - логинимся
+            table_now = Admin
+            login_user(admin, remember=form.remember_me.data)
+            return redirect("/lessons")  # переходим на страницу уроков
+        return render_template('login_admin.html', form=form, message="Неправильный логин или пароль")
+    return render_template('login_admin.html', title='Авторизация администратора', form=form)
 
 
 @app.route("/lessons/<int:lesson_id>", methods=['GET', 'POST'])
