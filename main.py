@@ -66,19 +66,23 @@ def login():
     return render_template('login_student.html', title='Авторизация ученика', form=form)
 
 
-@app.route("/lessons/<int:lesson_id>", methods=['GET', 'POST'])
+@app.route('/lessons/<int:lesson_id>/tasks_menu')
 def show_lesson(lesson_id):
+    return render_template('tasks_menu.html', ld=lesson_id)
+
+
+@app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])
+def show_task(lesson_id, task_id):
     '''Страница с уроком'''
     db_sess = db_session.create_session()
-    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
-    if lesson:  # если урок найден
-        lesson_form = LessonForm()  # создание python формы
-        examples = [example.split(':') for example in str(lesson.examples).split(';')]  # форматирование примеров
-
+    task = db_sess.query(Lesson).filter(Lesson.id == task_id).first()
+    if task:  # если урок найден
+        task_form = LessonForm()  # создание python формы
+        examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в уроке
-        if lesson_form.submit.data:
-            return redirect('/lessons')
-        return render_template('lesson.html', form=lesson_form, title='Название урока', lesson=lesson,
+        if task_form.submit.data:
+            return redirect(f'/lessons/{lesson_id}/tasks')
+        return render_template(f'task.html', form=task_form, title='Название урока', lesson=task,
                                examples=examples)
     return abort(404)  # урок не найден
 
