@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block content %}
+<form>
+  <link rel="stylesheet" href="../static/css/style.css">
+  <h1>{{ lesson.title }}</h1>
+    <div class="grid text-center" style="display: flex">
+        {% for task in tasks %}
+        <a href="{{ task.less_id }}/tasks/{{ task.id }}" type="button" class="btn btn-outline-secondary task">{{ task.title }}</a>
+        {% endfor %}
+    </div>
+</form>
+{% endblock %}

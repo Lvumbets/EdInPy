@@ -6,12 +6,15 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Task(SqlAlchemyBase, UserMixin, SerializerMixin):
     '''SQL база данных уроков'''
-    __tablename__ = 'lessons'
+    __tablename__ = 'tasks'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 
     title = sqlalchemy.Column(sqlalchemy.String)
+    condition = sqlalchemy.Column(sqlalchemy.String)
+    examples = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-    task = orm.relationship("Task", back_populates='lesson')
+    less_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('lessons.id'))
+    lesson = orm.relationship("Lesson")

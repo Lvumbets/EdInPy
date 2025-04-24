@@ -34,3 +34,13 @@ button {
     --bs-btn-font-size: .75rem;
 
 }
+
+.task .lesson {
+    width: 20em;
+    height: 20em;
+    margin-right: 50px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
