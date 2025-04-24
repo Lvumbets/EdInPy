@@ -1,18 +1,16 @@
 import datetime
 
-from flask import Flask, render_template, redirect, make_response, jsonify
-from flask import abort
+from flask import Flask, render_template, redirect, make_response, jsonify, abort
 from flask_login import LoginManager, login_user, login_required, logout_user
 
-from EdInPy.data.lessons import Lesson
-from EdInPy.data.tasks import Task
-from EdInPy.forms.task import TaskForm
 from data import db_session
 from data.lessons import Lesson
 from data.students import Student
+from data.tasks import Task
 from data.teachers import Teacher
-from forms.lesson import LessonForm
 from forms.student import RegisterStudent, LoginStudent
+from forms.task import TaskForm
+from forms.teacher import RegisterTeacher, LoginTeacher
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -74,7 +72,6 @@ def login_student():
     return render_template('login_student.html', title='Авторизация ученика', form=form)
 
 
-@app.route('/lessons/<int:lesson_id>')
 @app.route('/register_teacher', methods=['GET', 'POST'])
 def register_teacher():
     form = RegisterTeacher()
@@ -99,9 +96,9 @@ def register_teacher():
         '''Добавление id учителя к карточкам выбранных учеников'''
         if len(form.students.data.split()):
             for id in form.students.data.split():
-                student = db_sess.query(Student).filter(Student.id == id).first()
-                if student:
-                    student.teacher_id = teacher.id
+                teacher = db_sess.query(Student).filter(Student.id == id).first()
+                if teacher:
+                    teacher.teacher_id = teacher.id
 
         db_sess.commit()
         return redirect('/login_teacher')
@@ -123,11 +120,13 @@ def login_teacher():
         return render_template('login_teacher.html', form=form, message="Неправильный логин или пароль")
     return render_template('login_teacher.html', title='Авторизация учителя', form=form)
 
+
 @app.route('/lessons')
 def lessons():
     db_sess = db_session.create_session()
     less = db_sess.query(Lesson).all()
     return render_template('lessons.html', lessons=less)
+
 
 @app.route("/lessons/<int:lesson_id>", methods=['GET', 'POST'])
 def show_lesson(lesson_id):

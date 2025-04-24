@@ -17,4 +17,4 @@ class Task(SqlAlchemyBase, UserMixin, SerializerMixin):
     examples = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     less_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('lessons.id'))
-    lesson = orm.relationship("Lesson")
+    lesson = orm.relationship("Lesson", back_populates='task')

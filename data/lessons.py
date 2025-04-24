@@ -14,4 +14,4 @@ class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     title = sqlalchemy.Column(sqlalchemy.String)
 
-    task = orm.relationship("Task", back_populates='lesson')
+    task = orm.relationship("Task")
