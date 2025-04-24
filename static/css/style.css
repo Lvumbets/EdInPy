@@ -24,7 +24,7 @@ form.lessons {
     padding: 5px;
 }
 
-button {
+/* button {
     color: #fff;
     background-color: #73A353;
     width: 10em;
@@ -32,6 +32,8 @@ button {
     --bs-btn-padding-y: .100rem;
     --bs-btn-padding-x: .5rem;
     --bs-btn-font-size: .75rem;
+
+} */
 
 }
 
