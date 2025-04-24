@@ -10,10 +10,8 @@ from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin
-from forms.lesson import LessonForm
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm
-from forms.teacher import RegisterTeacher, LoginTeacher
 from forms.teacher import RegisterTeacher, LoginTeacher
 
 app = Flask(__name__)
@@ -72,7 +70,8 @@ def login_student():
             table_now = Student
             login_user(student, remember=form.remember_me.data)
             return redirect("/lessons")
-        return render_template('login_student.html', form=form, message="Неправильный логин или пароль")
+        return render_template('login_student.html', title='Авторизация ученика', form=form,
+                               message="Неправильный логин или пароль")
     return render_template('login_student.html', title='Авторизация ученика', form=form)
 
 
@@ -121,7 +120,8 @@ def login_teacher():
             table_now = Teacher
             login_user(teacher, remember=form.remember_me.data)
             return redirect("/lessons")  # переходим на страницу уроков
-        return render_template('login_teacher.html', form=form, message="Неправильный логин или пароль")
+        return render_template('login_teacher.html', title='Авторизация учителя', form=form,
+                               message="Неправильный логин или пароль")
     return render_template('login_teacher.html', title='Авторизация учителя', form=form)
 
 
@@ -137,7 +137,8 @@ def login_admin():
             table_now = Admin
             login_user(admin, remember=form.remember_me.data)
             return redirect("/lessons")  # переходим на страницу уроков
-        return render_template('login_admin.html', form=form, message="Неправильный логин или пароль")
+        return render_template('login_admin.html', title='Авторизация администратора', form=form,
+                               message="Неправильный логин или пароль")
     return render_template('login_admin.html', title='Авторизация администратора', form=form)
 
 
@@ -164,7 +165,8 @@ def show_task(lesson_id, task_id):
     if task:  # если урок найден
         task_form = TaskForm()  # создание python формы
         examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров задачи
-        # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в уроке
+
+        # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в задаче
         if task_form.submit.data:
             return redirect(f'/lessons/{lesson_id}/tasks')
         return render_template(f'task.html', form=task_form, title='Название задачи', task=task,
