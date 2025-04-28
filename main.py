@@ -1,11 +1,13 @@
 import datetime
 
 from flask import Flask, render_template, redirect, make_response, jsonify, abort
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from sqlalchemy.orm import Session
 
 from data import db_session
 from data.admins import Admin
 from data.lessons import Lesson
+from data.solutions import Solution
 from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
@@ -20,14 +22,7 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 
-table_now = None
-
-
-@login_manager.user_loader
-def load_user(id):
-    global table_now
-    db_sess = db_session.create_session()
-    return db_sess.query(table_now).get(id)
+table_now = Student
 
 
 @app.route('/')
@@ -168,10 +163,29 @@ def show_task(lesson_id, task_id):
 
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в задаче
         if task_form.submit.data:
-            return redirect(f'/lessons/{lesson_id}/tasks')
-        return render_template(f'task.html', form=task_form, title='Название задачи', task=task,
-                               examples=examples)
+            old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
+                                                          Solution.task_id == task.id).first()
+            # если есть старое решение => заменить на новое
+            if old_solution:
+                db_sess.delete(old_solution)
+
+            solution = Solution(
+                answer=task_form.code.data,
+                student_id=db_sess.query(Student).filter(current_user.id == Student.id).first().id,
+                task_id=task.id
+            )
+            db_sess.add(solution)
+            db_sess.commit()
+            return redirect(f'/lessons/{lesson_id}')
+        return render_template(f'task.html', form=task_form, task=task, examples=examples)
     return abort(404)  # урок не найден
+
+
+@login_manager.user_loader
+def load_user(id):
+    global table_now
+    db_sess = db_session.create_session()
+    return Session.get(entity=table_now, ident=id, self=db_sess)
 
 
 @app.route('/logout')

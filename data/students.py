@@ -23,7 +23,9 @@ class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
     teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teachers.id"))
+
     teacher = orm.relationship('Teacher', back_populates='student')
+    task = orm.relationship('Solution', back_populates='student')
 
     def __repr__(self):
         return '{surname} {name}'.format(surname=self.surname, name=self.name)
