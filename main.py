@@ -137,6 +137,11 @@ def login_admin():
     return render_template('login_admin.html', title='Авторизация администратора', form=form)
 
 
+@app.route('/about_us')
+def about_us():
+    return render_template('about_us.html')
+
+
 @app.route('/lessons')
 def lessons():
     db_sess = db_session.create_session()
