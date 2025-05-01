@@ -14,10 +14,10 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
     <nav class="navbar navbar-light bg-light d-flex bd-highlight mb-3">
-        <a class="navbar-brand me-auto p-1 bd-highlight" href="/"><h2>Education In Python</h2></a>
-        <a href="lessons" type="lesson" class="btn btn-success" style="margin-left: 100px;width: 5em;height: 2.5em;">Уроки</a>
-        <a href="about_us" type="lesson" class="btn btn-success" style="margin-left: 130px;margin-right: 130px;width: 5em;height: 2.5em;">О нас</a>
-        <a href="lessons" type="lesson" class="btn btn-success" style="margin-right: 100px;width: 5em;height: 2.5em;">Заявки</a>
+        <a href="/" class="navbar-brand me-auto p-1 bd-highlight" ><h2>Education In Python</h2></a>
+        <a href="/lessons" type="lesson" class="btn btn-success" style="margin-left: 100px;width: 5em;height: 2.5em;">Уроки</a>
+        <a href="/about_us" type="lesson" class="btn btn-success" style="margin-left: 130px;margin-right: 130px;width: 5em;height: 2.5em;">О нас</a>
+        <a href="/check_solutions" type="lesson" class="btn btn-success" style="margin-right: 100px;width: 5em;height: 2.5em;" >Заявки</a>
         {% if current_user.is_authenticated %}
         <a class="navbar-brand p-1 bd-highlight" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
         {% else %}

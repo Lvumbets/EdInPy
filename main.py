@@ -13,7 +13,7 @@ from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin
 from forms.student import RegisterStudent, LoginStudent
-from forms.task import TaskForm
+from forms.task import TaskForm, CheckSolve
 from forms.teacher import RegisterTeacher, LoginTeacher
 
 app = Flask(__name__)
@@ -149,7 +149,7 @@ def lessons():
     return render_template('lessons.html', lessons=less)
 
 
-@app.route("/lessons/<int:lesson_id>", methods=['GET', 'POST'])
+@app.route("/lessons/<int:lesson_id>")
 def show_lesson(lesson_id):
     db_sess = db_session.create_session()
     lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
@@ -181,9 +181,36 @@ def show_task(lesson_id, task_id):
             )
             db_sess.add(solution)
             db_sess.commit()
-            return redirect(f'/lessons/{lesson_id}')
+            return redirect(f'/{lesson_id}')
         return render_template(f'task.html', form=task_form, task=task, examples=examples)
     return abort(404)  # урок не найден
+
+
+@app.route('/check_solutions')
+def show_solutions():
+    db_sess = db_session.create_session()
+    solutions = db_sess.query(Solution).all()
+    lst = []
+    for solution in solutions:
+        student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
+        task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
+        lst.append(((student.name, student.surname), task.title, solution.id))
+    return render_template('check_solutions.html', solutions=lst)
+
+
+@app.route('/check_solutions/<int:solution_id>', methods=['GET', 'POST'])
+def show_solution(solution_id):
+    db_sess = db_session.create_session()
+    solution = db_sess.query(Solution).filter(Solution.id == solution_id).first()
+    student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
+    task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
+    examples = [example.split(':') for example in str(task.examples).split(';')]
+
+    form = CheckSolve()
+    if form.submit:
+        print('Сохранить ответ учителя после принятия решения о решении задачи учеником (удалить решение из списка)')
+    return render_template('check_solution.html', solution=solution, student=student, task=task, examples=examples,
+                           form=form)
 
 
 @login_manager.user_loader

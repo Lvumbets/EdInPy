@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% block content %}
+<form action="" method="post">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <h1>{{ student.name }} {{ student.surname }}</h1>
+    <h2>{{ solution.title }}</h2>
+    <div>
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.condition }}</p>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Входные данные</th>
+                    <th>Выходные данные</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for example in examples %}
+                <tr>
+                    <td>
+                        {% for i in example[0].split(',') %}
+                        <p>{{i}}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for i in example[1].split(',') %}
+                        <p>{{i}}</p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br>
+    <textarea cols="100" id="code" name="code" rows="10" disabled>{{solution.answer}}</textarea>
+    <p>{{ form.is_solved() }} {{ form.is_solved.label }} (если не решено - оставить пустым)</p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endblock %}
