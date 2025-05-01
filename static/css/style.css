@@ -46,3 +46,10 @@ form.lessons {
     align-items: center;
     justify-content: center;
 }
+
+hr{
+    border: none;
+    background-color: red;
+    color: red;
+    height: 20px;
+}
