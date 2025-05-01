@@ -7,7 +7,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
-    '''SQL база данных для учеников'''
+    '''SQL база данных для админов'''
     __tablename__ = 'admins'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -19,7 +19,7 @@ class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
 
-    access_level = sqlalchemy.Column(sqlalchemy.Integer, nullable=True, default=1)
+    access_level = sqlalchemy.Column(sqlalchemy.Integer, nullable=True, default=1)  # уровень доступа админа
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 

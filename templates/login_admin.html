@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h1>{{ title }}</h1>
+{% extends "base.html" %}{% block content %}
+<h1>Авторизация администратора</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
@@ -12,8 +10,8 @@
         {{ form.password.label }}<br>
         {{ form.password(class="form-control", type="password") }}<br>
     </p>
-    <h3>{{ message }}</h3>
     <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    <h2>{{ message }}</h2>
 </form>
 {% endblock %}

@@ -4,7 +4,8 @@ from wtforms.fields.simple import BooleanField
 from wtforms.validators import DataRequired
 
 
-class RegisterTeacher(FlaskForm):  # Форма регистрации учителя
+class RegisterTeacher(FlaskForm):
+    '''WTF форма для регистрации учителей'''
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     age = StringField('Возраст', validators=[DataRequired()])
@@ -18,7 +19,8 @@ class RegisterTeacher(FlaskForm):  # Форма регистрации учит�
     submit = SubmitField('Зарегистрироваться')
 
 
-class LoginTeacher(FlaskForm):  # Форма заполнения авторизации учителя
+class LoginTeacher(FlaskForm):
+    '''WTF форма для авторизации учителя'''
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')

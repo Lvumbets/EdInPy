@@ -1,8 +1,21 @@
 {% extends "base.html" %} {% block content %}
+<style>
+    form div {
+        display: flex;
+    }
+    .lesson {
+        width: 20em;
+        height: 20em;
+        margin-right: 50px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 <form>
-    <link rel="stylesheet" href="../static/css/style.css">
     <h1>Уроки</h1>
-    <div class="grid text-center" style="display: flex">
+    <div class="grid text-center">
         {% for lesson in lessons %}
         <a href="lessons/{{ lesson.id }}" type="button" class="btn btn-outline-secondary lesson">{{ lesson.title }}</a>
         {% endfor %}

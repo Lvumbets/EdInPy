@@ -7,7 +7,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Solution(SqlAlchemyBase, UserMixin, SerializerMixin):
-    '''SQL база данных для учеников'''
+    '''SQL база данных для решений'''
     __tablename__ = 'solutions'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
