@@ -263,12 +263,24 @@ def load_user(id):
     return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
 
+@app.route('/rating')
+def rating():
+    return render_template('rating.html')
+
+
 @app.route('/logout')
 @login_required
 def logout():
     '''Функция деавторизации пользователя'''
     logout_user()
     return redirect("/")
+
+
+@app.route('/profile')
+def profile():
+    db_sess = db_session.create_session()
+    # less = db_sess.query(Lesson).all()
+    return render_template('profile.html')
 
 
 @app.errorhandler(404)

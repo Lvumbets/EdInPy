@@ -8,21 +8,26 @@
     <link rel="stylesheet" href="../static/css/style.css">
     <style>
         nav a.lessons {
-            margin-left: 100px;
-            width: 5em;
-            height: 2.5em;
+            margin-right: 220px;
+            width: 7em;
+            height: 3em;
         }
 
         nav a.about_us {
-          margin: 0 130px;
-          width: 5em;
-          height: 2.5em;
+          margin-right: 220px;
+          width: 7em;
+          height: 3em;
         }
 
          nav a.solutions {
+            margin-right: 220px;
+            width: 7em;
+            height: 3em;
+        }
+        nav a.rating {
             margin-right: 100px;
-            width: 5em;
-            height: 2.5em;
+            width: 7em;
+            height: 3em;
         }
     </style>
     <title>EdInPy</title>
@@ -38,7 +43,8 @@
         <a href="/about_us" type="lesson" class="btn btn-success about_us">О нас</a>
         <a href="/check_solutions" type="lesson" class="btn btn-success solutions">Заявки</a>
         {% if current_user.is_authenticated %}
-        <a class="navbar-brand p-1 bd-highlight" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
+        <a class="btn rating" href="/rating">Рейтинг</a>
+        <a class="navbar-brand p-1 bd-highlight" href="/profile">{{ current_user.name }} {{ current_user.surname }}</a>
         {% else %}
         <div class="dropdown p-1 bd-highlight">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
