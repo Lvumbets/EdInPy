@@ -1,52 +1,66 @@
 {% extends "base.html" %} {% block content %}
 <style>
-   table {
-    width: 300px;
-    border-collapse: collapse;
-   }
-   td, th {
-    padding: 3px;
-    border: 1px solid black;
-   }
-   th {
-    background: #b0e0e6;
-   }
-  </style>
+    table {
+     width: 300px;
+     border-collapse: collapse;
+    }
+    td, th {
+     padding: 3px;
+     border: 1px solid black;
+    }
+    th {
+     background: #b0e0e6;
+    }
+</style>
 <form action="" method="post">
-  <header>
-    <h1>{{ task.title }}</h1>
-  </header>
-  <div>
-    <div><p>{{ task.condition }}</p></div>
+    <header>
+        <h1>{{ task.title }}</h1>
+    </header>
     <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Входные данные</th>
-            <th>Выходные данные</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for example in examples %}
-          <tr>
-            <td>
-              {% for i in example[0].split(',') %}
-              <p>{{i}}</p>
-              {% endfor %}
-            </td>
-            <td>
-                {% for i in example[1].split(',') %}
-                <p>{{i}}</p>
+        <div><p>{{ task.condition }}</p></div>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Входные данные</th>
+                    <th>Выходные данные</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for example in examples %}
+                <tr>
+                    <td>
+                        {% for i in example[0].split(',') %}
+                        <p>{{i}}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for i in example[1].split(',') %}
+                        <p>{{i}}</p>
+                        {% endfor %}
+                    </td>
+                </tr>
                 {% endfor %}
-              </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                </tbody>
+            </table>
+        </div>
+        <br/>
+        <div>{{ form.code(cols=100, rows=10) }}</div>
+        {% if is_checked %}
+        <p>Задача проверена</p>
+        {% if is_solved %}
+        <p>Решена</p>
+        {% else %}
+        <p>Не решена</p>
+        {% endif %}
+        {% else %}
+        {% if is_send %}
+        <p>Задача отправлена</p>
+        {% else %}
+        <p>Задача не отправлена</p>
+        {% endif %}
+        {% endif %}
+        <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
     </div>
-    <br />
-    <div>{{ form.code(cols=100, rows=10) }}</div>
-    <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
-  </div>
 </form>
 {% endblock %}

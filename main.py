@@ -165,31 +165,55 @@ def show_task(lesson_id, task_id):
     if task:  # если урок найден
         task_form = TaskForm()  # создание python формы
         examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров задачи
-
+        old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
+                                                      Solution.task_id == task.id).first()  # ищем старое решение
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в задаче
         if task_form.submit.data:
-            old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
-                                                          Solution.task_id == task.id).first()
-            # если есть старое решение => заменить на новое
-            if old_solution:
-                db_sess.delete(old_solution)
+            def add_new_solution():
+                '''Функция добавления нового решения'''
+                solution = Solution(
+                    answer=task_form.code.data,
+                    student_id=db_sess.query(Student).filter(current_user.id == Student.id).first().id,
+                    task_id=task.id
+                )
+                db_sess.add(solution)
+                db_sess.commit()
 
-            solution = Solution(
-                answer=task_form.code.data,
-                student_id=db_sess.query(Student).filter(current_user.id == Student.id).first().id,
-                task_id=task.id
-            )
-            db_sess.add(solution)
-            db_sess.commit()
-            return redirect(f'/{lesson_id}')
-        return render_template(f'task.html', form=task_form, task=task, examples=examples)
+            # если есть старое решение и оно неправильное => заменить на новое
+            if old_solution:  # если есть старое решение
+                if not old_solution.is_solved:  # если оно неверное => удаляем старое и пропускаем новое решение
+                    db_sess.delete(old_solution)
+                    add_new_solution()
+                    return redirect(f'/lessons/{lesson_id}')
+            else:  # если отправляем решение в первый раз
+                add_new_solution()
+                return redirect(f'/lessons/{lesson_id}')
+            return render_template(f'task.html', form=task_form, task=task, examples=examples,
+                                   is_checked=old_solution.is_checked, is_solved=old_solution.is_solved, is_send=True)
+
+        is_checked, is_solved = False, False
+        if old_solution:  # если решение было отправлено раньше
+            is_send = True
+            if old_solution.is_checked:  # если решение было проверено
+                is_checked = True
+            else:  # если решение не было проверено
+                is_checked = False
+            if old_solution.is_solved:  # если решение было верным
+                is_solved = True
+            else:  # если решение не было верным
+                is_solved = False
+        else:  # если ещё не отправляли
+            is_send = False
+
+        return render_template(f'task.html', form=task_form, task=task, examples=examples,
+                               is_checked=is_checked, is_solved=is_solved, is_send=is_send)
     return abort(404)  # урок не найден
 
 
 @app.route('/check_solutions')
 def show_solutions():
     db_sess = db_session.create_session()
-    solutions = db_sess.query(Solution).all()
+    solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
     lst = []
     for solution in solutions:
         student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
@@ -207,8 +231,16 @@ def show_solution(solution_id):
     examples = [example.split(':') for example in str(task.examples).split(';')]
 
     form = CheckSolve()
-    if form.submit:
-        print('Сохранить ответ учителя после принятия решения о решении задачи учеником (удалить решение из списка)')
+    if form.submit.data:  # если нажата кнопка 'сохранить'
+        if form.is_solved.data:  # если задача решена
+            student.completed_tasks += 1  # к кол-ву решённых задач
+            solution.is_checked = True  # проверена
+            solution.is_solved = True  # решена
+        else:  # если не решена
+            solution.is_checked = True  # проверена
+            solution.is_solved = False  # не решена
+        db_sess.commit()
+        return redirect('/check_solutions')
     return render_template('check_solution.html', solution=solution, student=student, task=task, examples=examples,
                            form=form)
 
