@@ -1,23 +1,11 @@
 {% extends "base.html" %} {% block content %}
-<style>
-    table {
-     width: 300px;
-     border-collapse: collapse;
-    }
-    td, th {
-     padding: 3px;
-     border: 1px solid black;
-    }
-    th {
-     background: #b0e0e6;
-    }
-</style>
 <form action="" method="post">
-    <header>
-        <h1>{{ task.title }}</h1>
-    </header>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <h1>{{ student.name }} {{ student.surname }}</h1>
+    <h2>{{ solution.title }}</h2>
     <div>
-        <div><p>{{ task.condition }}</p></div>
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.condition }}</p>
         <div>
             <table>
                 <thead>
@@ -44,23 +32,10 @@
                 </tbody>
             </table>
         </div>
-        <br/>
-        <div>{{ form.code(cols=100, rows=10) }}</div>
-        {% if is_checked %}
-        <p>Задача проверена</p>
-        {% if is_solved %}
-        <p>Решена</p>
-        {% else %}
-        <p>Не решена</p>
-        {% endif %}
-        {% else %}
-        {% if is_send %}
-        <p>Задача отправлена</p>
-        {% else %}
-        <p>Задача не отправлена</p>
-        {% endif %}
-        {% endif %}
-        <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
     </div>
+    <br>
+    <textarea cols="100" id="code" name="code" rows="10" disabled>{{solution.answer}}</textarea>
+    <p>{{ form.is_solved() }} {{ form.is_solved.label }} (если не решено - оставить пустым)</p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
 </form>
 {% endblock %}

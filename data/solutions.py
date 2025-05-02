@@ -17,8 +17,11 @@ class Solution(SqlAlchemyBase, UserMixin, SerializerMixin):
     student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("students.id"))
     task_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("tasks.id"))
 
+    is_checked = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+    is_solved = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+
     student = orm.relationship('Student')
     task = orm.relationship('Task')
 
     def __repr__(self):
-        return f'{self.answer} {self.student_id} {self.task_id} '
+        return f'{self.answer} {self.student_id} {self.task_id}'

@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<form>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <div class="grid text-center" style="display: flex">
+        {% for solution in solutions %}
+        <div style="border: 3px solid black;">
+            <h3>{{solution[1]}}</h3>
+            <a href="check_solutions/{{ solution[2] }}" type="button" class="btn btn-outline-secondary">{{solution[0][0]}}
+                {{solution[0][1]}}</a>
+        </div>
+        {% endfor %}
+    </div>
+</form>
+{% endblock %}
