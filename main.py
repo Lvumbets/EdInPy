@@ -205,6 +205,11 @@ def load_user(id):
     return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
 
+@app.route('/rating')
+def rating():
+    return render_template('rating.html')
+
+
 @app.route('/logout')
 @login_required
 def logout():
