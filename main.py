@@ -200,6 +200,13 @@ def logout():
     return redirect("/")
 
 
+@app.route('/profile')
+def profile():
+    db_sess = db_session.create_session()
+    # less = db_sess.query(Lesson).all()
+    return render_template('profile.html')
+
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
