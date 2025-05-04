@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка изображения</title>
+</head>
+<body>
+<form class="upload_form" method="post" style="margin-left: 35%" enctype="multipart/form-data">
+           <div class="form-group">
+                <label for="photo">Выберите файл</label>
+                <input type="file" class="form-control-file" id="photo" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+<a  type="button" class="btn btn-success" href="profile">Вернуться в профиль</a>
+</body>
+</html>
+{% endblock %}
