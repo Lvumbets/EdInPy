@@ -25,10 +25,13 @@
 <body>
 
 <div class="card d" style="width: 18rem;">
-  <img src="{url_for('upload', filename=)}" class="card-img-top" alt="Не удалось получить изображение">
+  {% if current_user.image_name %}
+  <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" class="card-img-top" alt="Не удалось получить изображение">
+  {% endif %}
   <div class="card-body">
     <h1 class="card-title">{{ current_user.name }} {{ current_user.surname }}</h1>
-    <p class="card-text">Возраст: {{ current_user.age }}, Почта: {{ current_user.email }}</p>
+    <p class="card-text">Возраст: {{ current_user.age }}</p>
+    <p class="card-text">Почта: {{ current_user.email }}</p>
     <a type="button" class="btn btn-success" href="load_image">Загрузить изображение</a>
   </div>
 </div>
