@@ -14,10 +14,11 @@ from data.solutions import Solution
 from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
-from forms.admin import LoginAdmin
+from forms.admin import LoginAdmin, RegisterAdmin
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve
 from forms.teacher import RegisterTeacher, LoginTeacher
+from static.config import config
 
 '''Создание ключевых значений и переменных для Flask'''
 app = Flask(__name__)
@@ -89,6 +90,11 @@ def register_teacher():
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
             return render_template('register_teacher.html', form=form,
                                    message="Пароли не совпадают")  # отображение ошибки
+        if form.access_code.data not in config.teachers_access_tokens:
+            config.update_teachers_passwords()
+            return render_template('register_teacher.html', form=form,
+                                   message="Неверный код учителя")  # отображение ошибки
+        config.update_teachers_passwords()
         db_sess = db_session.create_session()
         if db_sess.query(Teacher).filter(Teacher.email == form.email.data).first():  # если такой учитель уже есть
             return render_template('register_teacher.html', form=form,
@@ -133,6 +139,38 @@ def login_teacher():
     return render_template('login_teacher.html', form=form)  # отображение страницы логина учителя
 
 
+@app.route('/register_admin', methods=['GET', 'POST'])
+def register_admin():
+    '''Функция регистрации админа'''
+    form = RegisterAdmin()  # форма регистрации админа
+    if form.validate_on_submit():  # если нажата кнопка регистрации
+        if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
+            return render_template('register_admin.html', form=form,
+                                   message="Пароли не совпадают")  # отображение ошибки
+        if form.access_code.data not in config.admins_access_tokens:
+            config.update_admins_passwords()
+            return render_template('register_admin.html', form=form,
+                                   message="Неверный код администратора")  # отображение ошибки
+        config.update_admins_passwords()
+        db_sess = db_session.create_session()
+        if db_sess.query(Admin).filter(Admin.email == form.email.data).first():  # если такой админ уже есть
+            return render_template('register_admin.html', form=form,
+                                   message="Такой администратор уже есть")  # отображение ошибки
+        # создание админа для дб
+        admin = Admin(
+            name=form.name.data,
+            surname=form.surname.data,
+            age=form.age.data,
+            email=form.email.data,
+            access_level=1,
+        )
+        admin.set_password(form.password.data)  # установка пароля для админа
+        db_sess.add(admin)  # добавление админа в бд
+        db_sess.commit()  # сохранение изменений в бд
+        return redirect('/login_admin')  # перевод на авторизацию админа
+    return render_template('register_admin.html', form=form)  # отображение страницы регистрации админа
+
+
 @app.route('/login_admin', methods=['GET', 'POST'])
 def login_admin():
     '''Функция логина администратора'''
@@ -141,7 +179,7 @@ def login_admin():
     if form.validate_on_submit():  # при нажатии на кнопку
         db_sess = db_session.create_session()
         admin = db_sess.query(Admin).filter(Admin.email == form.email.data).first()  # поиск админа по бд
-        if admin and admin.check_password(form.password.data):  # если учитель найден - логинимся
+        if admin and admin.check_password(form.password.data):  # если админ найден - логинимся
             table_now = Admin
             login_user(admin, remember=form.remember_me.data)  # логин админа в сессии
             return redirect("/lessons")  # переходим на страницу уроков
@@ -184,7 +222,7 @@ def show_task(lesson_id, task_id):
         old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
                                                       Solution.task_id == task.id).first()  # ищем старое решение
         # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в задаче
-        if task_form.submit.data:
+        if task_form.submit.data and table_now == Student:  # если отправил код ученик
             def add_new_solution():
                 '''Функция добавления нового решения'''
                 solution = Solution(
@@ -228,14 +266,16 @@ def show_task(lesson_id, task_id):
 
 @app.route('/check_solutions')
 def show_solutions():
-    db_sess = db_session.create_session()
-    solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
-    lst = []
-    for solution in solutions:
-        student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
-        task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
-        lst.append(((student.name, student.surname), task.title, solution.id))
-    return render_template('check_solutions.html', solutions=lst)
+    if table_now == Teacher:
+        db_sess = db_session.create_session()
+        solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
+        lst = []
+        for solution in solutions:
+            student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
+            task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
+            lst.append(((student.name, student.surname), task.title, solution.id))
+        return render_template('check_solutions.html', solutions=lst)
+    return redirect('/')
 
 
 @app.route('/check_solutions/<int:solution_id>', methods=['GET', 'POST'])
@@ -263,8 +303,7 @@ def show_solution(solution_id):
 
 @login_manager.user_loader
 def load_user(id):
-    '''функция авторизации пользователя в сессии'''
-    global table_now
+    '''Функция авторизации пользователя в сессии'''
     db_sess = db_session.create_session()
     return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
@@ -318,6 +357,8 @@ def bad_request(_):
 
 def main():
     '''Функция запуска сайта'''
+    config.update_teachers_passwords()  # получение новых кодов для учителей
+    config.update_admins_passwords()  # получение новых кодов для админов
     db_session.global_init('db/ed_in_py.sqlite')
     app.run()
 

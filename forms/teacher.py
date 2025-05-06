@@ -16,6 +16,8 @@ class RegisterTeacher(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
 
+    access_code = StringField('Код учителя', validators=[DataRequired()])
+
     submit = SubmitField('Зарегистрироваться')
 
 
