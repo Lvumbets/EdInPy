@@ -23,6 +23,8 @@ class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
+    image_name = sqlalchemy.Column(sqlalchemy.Text, nullable=True, unique=True)
+
     def __repr__(self):
         return '{surname} {name} is admin'.format(surname=self.surname, name=self.name)
 

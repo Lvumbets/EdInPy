@@ -23,6 +23,8 @@ class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
+    image_name = sqlalchemy.Column(sqlalchemy.Text, nullable=True, unique=True)
+
     student = orm.relationship("Student")
 
     def __repr__(self):

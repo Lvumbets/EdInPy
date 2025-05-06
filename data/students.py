@@ -29,6 +29,8 @@ class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
     teacher = orm.relationship('Teacher', back_populates='student')
     task = orm.relationship('Solution', back_populates='student')
 
+    image_name = sqlalchemy.Column(sqlalchemy.Text, nullable=True, unique=True)
+
     def __repr__(self):
         return '{surname} {name}'.format(surname=self.surname, name=self.name)
 

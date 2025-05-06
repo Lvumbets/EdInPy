@@ -1,8 +1,11 @@
 import datetime
+import os
+import uuid
 
-from flask import Flask, render_template, redirect, make_response, jsonify, abort
+from flask import Flask, render_template, redirect, make_response, jsonify, abort, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.orm import Session
+from werkzeug.utils import secure_filename
 
 from data import db_session
 from data.admins import Admin
@@ -22,9 +25,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
+app.config['UPLOAD_FOLDER'] = "static/upload"
 
 '''Глобальные переменные'''
 table_now = Student
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
 @app.route('/')
@@ -277,10 +283,25 @@ def logout():
 
 
 @app.route('/profile')
+@login_required
 def profile():
-    db_sess = db_session.create_session()
-    # less = db_sess.query(Lesson).all()
-    return render_template('profile.html')
+    return render_template('profile.html', user=current_user)
+
+
+@login_required
+@app.route('/load_image', methods=['POST', 'GET'])
+def load_image():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file.filename:
+            ext = file.filename.rsplit('.', 1)[1].lower()
+            filename = f'{str(uuid.uuid4())}.{ext}'
+            with db_session.create_session() as dbs:
+                user = dbs.query(table_now).filter(current_user.id == table_now.id).first()
+                user.image_name = filename
+                dbs.commit()
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
+    return render_template('load_image.html')
 
 
 @app.errorhandler(404)
