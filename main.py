@@ -29,7 +29,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = "static/upload"
 
 '''Глобальные переменные'''
-table_now = Student
+table_now = Admin  # изменить на None!!!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -199,7 +199,8 @@ def lessons():
     '''Функция отображения уроков'''
     db_sess = db_session.create_session()
     less = db_sess.query(Lesson).all()  # получение всех уроков
-    return render_template('lessons.html', lessons=less)  # отображение страницы уроков
+    return render_template('lessons.html', lessons=less, table_now=table_now,
+                           Admin=Admin)  # отображение страницы уроков
 
 
 @app.route("/lessons/<int:lesson_id>")
@@ -301,11 +302,28 @@ def show_solution(solution_id):
                            form=form)
 
 
+@app.route('/lessons/change/<int:lesson_id>')
+def change_lesson(lesson_id):
+    db_sess = db_session.create_session()
+    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
+    # добавить wtf-форму для изменения урока! (названия, принадлежащие к этому уроку задачи)
+    return redirect('/')
+
+@app.route('/lessons/delete/<int:lesson_id>')
+def delete_lesson(lesson_id):
+    db_sess = db_session.create_session()
+    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
+    db_sess.delete(lesson)
+    db_sess.commit()
+    return redirect('/lessons')
+
+
 @login_manager.user_loader
 def load_user(id):
     '''Функция авторизации пользователя в сессии'''
     db_sess = db_session.create_session()
-    return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
+    if table_now:
+        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
 
 @app.route('/rating')

@@ -1,23 +1,47 @@
 {% extends "base.html" %} {% block content %}
 <style>
-    form div {
+    div.lessons {
         display: flex;
+        justify-content: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+
     }
-    .lesson {
+    div.lesson {
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 40px;
+    }
+    a.lesson {
         width: 20em;
-        height: 20em;
+        height: 10em;
         margin-right: 50px;
         font-weight: bold;
+    }
+    .lesson_buttons {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: row;
+    }
+    .lesson_buttons a {
+        width: 10em;
     }
 </style>
 <form>
     <h1>Уроки</h1>
-    <div class="grid text-center">
+    <div class="lessons">
         {% for lesson in lessons %}
-        <a href="lessons/{{ lesson.id }}" type="button" class="btn btn-outline-secondary lesson">{{ lesson.title }}</a>
+        <div class="lesson">
+            <a href="lessons/{{ lesson.id }}" type="button" class="btn btn-outline-secondary lesson">{{ lesson.title
+                }}</a>
+            {% if table_now == Admin %}
+            <div class="lesson_buttons">
+                <a href="lessons/change/{{ lesson.id }}" class="btn btn-warning">Изменить</a>
+                <a href="lessons/delete/{{ lesson.id }}" class="btn btn-danger">Удалить</a>
+            </div>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
 </form>
