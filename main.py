@@ -4,10 +4,12 @@ import uuid
 
 from flask import Flask, render_template, redirect, make_response, jsonify, abort, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_restful import Api
 from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 from data import db_session
+from data.rest_api import lessons_resource
 from data.admins import Admin
 from data.lessons import Lesson
 from data.solutions import Solution
@@ -22,6 +24,7 @@ from static.config import config
 
 '''Создание ключевых значений и переменных для Flask'''
 app = Flask(__name__)
+api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
@@ -357,9 +360,14 @@ def bad_request(_):
 
 def main():
     '''Функция запуска сайта'''
+    api.add_resource(lessons_resource.LessonsListResource, '/api/lessons')  # api для списка уроков
+    api.add_resource(lessons_resource.LessonResource, '/api/lessons/<int:lesson_id>')  # api для конкретного урока
+
     config.update_teachers_passwords()  # получение новых кодов для учителей
     config.update_admins_passwords()  # получение новых кодов для админов
-    db_session.global_init('db/ed_in_py.sqlite')
+
+    db_session.global_init('db/ed_in_py.sqlite')  # инициализация базы данных
+
     app.run()
 
 
