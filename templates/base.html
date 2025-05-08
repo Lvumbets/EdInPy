@@ -9,24 +9,24 @@
     <link rel="stylesheet" href="../static/css/style.css">
     <style>
         nav a.lessons {
-            margin-right: 220px;
+            margin-right: 5%;
             width: 7em;
             height: 3em;
         }
 
         nav a.about_us {
-          margin-right: 220px;
+          margin-right: 5%;
           width: 7em;
           height: 3em;
         }
 
          nav a.solutions {
-            margin-right: 220px;
+            margin-right: 5%;
             width: 7em;
             height: 3em;
         }
         nav a.rating {
-            margin-right: 100px;
+            margin-right: 25%;
             width: 7em;
             height: 3em;
         }
@@ -41,9 +41,9 @@
     <nav class="navbar navbar-light bg-light d-flex bd-highlight mb-3">
         <img src="{{url_for('static', filename='edinpy.png')}}"/>
         <a href="/" class="navbar-brand me-auto p-1 bd-highlight"><h2>Education In Python</h2></a>
-        <a href="/lessons" type="lesson" class="btn btn-success lessons">Уроки</a>
-        <a href="/about_us" type="lesson" class="btn btn-success about_us">О нас</a>
-        <a href="/check_solutions" type="lesson" class="btn btn-success solutions">Заявки</a>
+        <a href="/lessons" type="lesson" class="btn lessons">Уроки</a>
+        <a href="/about_us" type="lesson" class="btn about_us">О нас</a>
+        <a href="/check_solutions" type="lesson" class="btn solutions">Заявки</a>
         {% if current_user.is_authenticated %}
         <a class="btn rating" href="/rating">Рейтинг</a>
         <a class="navbar-brand p-1 bd-highlight" href="/profile">{{ current_user.name }} {{ current_user.surname }}</a>

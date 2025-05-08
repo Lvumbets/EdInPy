@@ -1,4 +1,11 @@
 {% extends "base.html" %} {% block content %}
+<style>
+        .b {
+            position:absolute;
+            left:5px;
+            bottom:5px;
+    </style>
+<h1>Загрузка изображения</h1><br>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +19,7 @@
             </div>
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
-<a  type="button" class="btn btn-success" href="profile">Вернуться в профиль</a>
+<a  type="button" class="btn btn-success b" href="profile">Вернуться в профиль</a>
 </body>
 </html>
 {% endblock %}
