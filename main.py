@@ -15,6 +15,7 @@ from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin, RegisterAdmin
+from forms.lesson import LessonEdit
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve
 from forms.teacher import RegisterTeacher, LoginTeacher
@@ -302,12 +303,24 @@ def show_solution(solution_id):
                            form=form)
 
 
-@app.route('/lessons/change/<int:lesson_id>')
-def change_lesson(lesson_id):
+@app.route('/lessons/edit/<int:lesson_id>', methods=['GET', 'POST'])
+def lesson_edit(lesson_id):
+    '''Функция страницы редактирования урока'''
+    lesson_edit = LessonEdit()
     db_sess = db_session.create_session()
     lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
-    # добавить wtf-форму для изменения урока! (названия, принадлежащие к этому уроку задачи)
-    return redirect('/')
+
+    if lesson_edit.submit.data:  # если нажали на кнопку 'сохранить'
+        lesson.title = lesson_edit.title.data
+        lesson.description = lesson_edit.description.data
+        db_sess.commit()
+        return redirect('/lessons')
+
+    # отображать данные этого урока в форме изначально (для их изменения)
+    lesson_edit.title.data = lesson.title
+    lesson_edit.description.data = lesson.description
+    return render_template('lesson_edit.html', form=lesson_edit)
+
 
 @app.route('/lessons/delete/<int:lesson_id>')
 def delete_lesson(lesson_id):

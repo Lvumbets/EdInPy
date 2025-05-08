@@ -33,11 +33,11 @@
     <div class="lessons">
         {% for lesson in lessons %}
         <div class="lesson">
-            <a href="lessons/{{ lesson.id }}" type="button" class="btn btn-outline-secondary lesson">{{ lesson.title
-                }}</a>
+            <a href="lessons/{{ lesson.id }}" type="button" class="btn btn-outline-secondary lesson"><h3><b>{{
+                lesson.title }}</b></h3>{{ lesson.description }}</a>
             {% if table_now == Admin %}
             <div class="lesson_buttons">
-                <a href="lessons/change/{{ lesson.id }}" class="btn btn-warning">Изменить</a>
+                <a href="lessons/edit/{{ lesson.id }}" class="btn btn-warning">Изменить</a>
                 <a href="lessons/delete/{{ lesson.id }}" class="btn btn-danger">Удалить</a>
             </div>
             {% endif %}
