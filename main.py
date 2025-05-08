@@ -18,6 +18,7 @@ from forms.admin import LoginAdmin, RegisterAdmin
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve
 from forms.teacher import RegisterTeacher, LoginTeacher
+from forms.change_password import Change_Password
 from static.config import config
 
 '''Создание ключевых значений и переменных для Flask'''
@@ -322,7 +323,6 @@ def logout():
 
 
 @app.route('/profile')
-@login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
@@ -353,6 +353,29 @@ def not_found(error):
 def bad_request(_):
     '''функция выброса ошибки о неправильном request запросе'''
     return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
+@app.route('/change_password', methods=['POST', 'GET'])
+@login_required
+def change_password():
+    '''Функция изменения пароля'''
+    form = Change_Password()  # форма изменения пароля
+    if form.validate_on_submit():  # если нажата кнопка изменения
+        if form.new_password.data != form.new_password_again.data:  # если введённые пароли не совпадают
+            return render_template('change_password.html', form=form,
+                                   message="Пароли не совпадают")  # отображение ошибки
+        if not current_user.check_password(form.current_password.data):
+            return render_template('change_password.html', form=form,
+                                   message="Неверно введён текущий пароль")  # отображение ошибки
+        if form.current_password.data == form.new_password.data:
+            return render_template('change_password.html', form=form,
+                                   message="Новый и Текущий пароль совпадают")  # отображение ошибки
+        with db_session.create_session() as dbs:
+            user = dbs.query(current_user.__class__).filter(current_user.id == table_now.id).first()
+            user.set_password(form.new_password.data)
+            dbs.commit()
+        return redirect('/profile')  # перевод на профиль
+    return render_template('change_password.html', form=form)
 
 
 def main():
