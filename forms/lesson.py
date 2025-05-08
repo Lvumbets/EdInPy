@@ -7,7 +7,7 @@ class LessonAdd(FlaskForm):
     title = StringField('Название')
     description = StringField('Описание')
 
-    submit = SubmitField('Сохранить')
+    submit = SubmitField('Добавить')
 
 
 class LessonEdit(FlaskForm):
@@ -15,4 +15,4 @@ class LessonEdit(FlaskForm):
     title = StringField('Название')
     description = StringField('Описание')
 
-    submit = SubmitField('Добавить')
+    submit = SubmitField('Сохранить')

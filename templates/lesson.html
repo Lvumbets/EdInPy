@@ -1,25 +1,52 @@
 {% extends "base.html" %} {% block content %}
 <style>
-    form div {
-        display: flex;
+    h1 {
+        text-align: center;
     }
-    .task {
+    div.tasks {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+    }
+    div.task {
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 40px;
+    }
+    a.task {
         width: 20em;
-        height: 20em;
+        height: 10em;
         margin-right: 50px;
         font-weight: bold;
+    }
+    .task_buttons {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: row;
+    }
+    .task_buttons a {
+        width: 10em;
     }
 </style>
 <form>
-    <h1>{{ lesson.title }}</h1>
-    <div class="grid text-center">
+    <h1>Задачи</h1>
+    <div class="tasks">
         {% for task in tasks %}
-        <a href="{{ task.less_id }}/tasks/{{ task.id }}" type="button" class="btn btn-outline-secondary task">{{
-            task.title }}</a>
+        <div class="task">
+            <a href="/lessons/{{ lesson.id }}/tasks/{{ task.id }}" type="button" class="btn btn-outline-secondary task">{{
+                task.title }}</a>
+            {% if is_admin %}
+            <div class="task_buttons">
+                <a href="/lessons/{{ lesson.id }}/tasks/edit/{{ task.id }}" class="btn btn-warning">Изменить</a>
+                <a href="/lessons/{{ lesson.id }}/tasks/delete/{{ task.id }}" class="btn btn-danger">Удалить</a>
+            </div>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
+    <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success">Добавить задачу</a>
 </form>
 {% endblock %}

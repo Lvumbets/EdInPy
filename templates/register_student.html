@@ -20,7 +20,6 @@
         {{ form.email.label }}<br>
         {{ form.email(class="form-control", type="email") }}<br>
     </p>
-    <h3>{{ message }}</h3>
     <p>
         {{ form.password.label }}<br>
         {{ form.password(class="form-control", type="password") }}<br>
@@ -29,6 +28,7 @@
         {{ form.password_again.label }}<br>
         {{ form.password_again(class="form-control", type="password") }}<br>
     </p>
+    <h3>{{ message }}</h3>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
 </form>
 {% endblock %}

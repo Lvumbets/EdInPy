@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% block content %}
+<h1>Редактор урока</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(class="form-control") }}<br>
+    </p>
+    <p>
+        {{ form.condition.label }}<br>
+        {{ form.condition(class="form-control") }}<br>
+    </p>
+    <p>
+        {{ form.examples.label }}<br>
+        {{ form.examples(class="form-control") }}<br>
+    </p>
+    <p>
+        {{ form.less_id.label }}<br>
+        {{ form.less_id(class="form-control") }}<br>
+    </p>
+    <h3>{{ message }}</h3>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endblock %}
