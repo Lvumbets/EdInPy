@@ -15,7 +15,7 @@ from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin, RegisterAdmin
-from forms.lesson import LessonEdit
+from forms.lesson import LessonEdit, LessonAdd
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve
 from forms.teacher import RegisterTeacher, LoginTeacher
@@ -304,7 +304,7 @@ def show_solution(solution_id):
 
 
 @app.route('/lessons/edit/<int:lesson_id>', methods=['GET', 'POST'])
-def lesson_edit(lesson_id):
+def edit_lesson(lesson_id):
     '''Функция страницы редактирования урока'''
     lesson_edit = LessonEdit()
     db_sess = db_session.create_session()
@@ -319,7 +319,24 @@ def lesson_edit(lesson_id):
     # отображать данные этого урока в форме изначально (для их изменения)
     lesson_edit.title.data = lesson.title
     lesson_edit.description.data = lesson.description
-    return render_template('lesson_edit.html', form=lesson_edit)
+    return render_template('edit_lesson.html', form=lesson_edit)
+
+
+@app.route('/lessons/add', methods=['GET', 'POST'])
+def add_lesson():
+    '''Функция страницы добавления нового урока'''
+    lesson_add = LessonAdd()
+    db_sess = db_session.create_session()
+
+    if lesson_add.submit.data:  # если нажата кнопка 'добавить'
+        lesson = Lesson(
+            title=lesson_add.title.data,
+            description=lesson_add.description.data,
+        )
+        db_sess.add(lesson)
+        db_sess.commit()
+        return redirect('/lessons')
+    return render_template('add_lesson.html', form=lesson_add)
 
 
 @app.route('/lessons/delete/<int:lesson_id>')
