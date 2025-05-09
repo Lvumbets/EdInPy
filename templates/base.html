@@ -16,8 +16,8 @@
 
         nav a.about_us {
           margin-right: 5%;
-          width: 7em;
-          height: 3em;
+          width: 35em;
+          height: 7em;
         }
 
          nav a.solutions {
@@ -30,6 +30,15 @@
             width: 7em;
             height: 3em;
         }
+        #footer {
+            position: fixed; /* Фиксированное положение */
+            left: 0; bottom: 0; /* Левый нижний угол */
+            padding: 10px; /* Поля вокруг текста */
+            background: #D3D3D3; /* Цвет фона */
+            color: #fff; /* Цвет текста */
+            width: 100%; /* Ширина слоя */
+   }
+
     </style>
     <title>EdInPy</title>
 </head>
@@ -42,7 +51,6 @@
         <img src="{{url_for('static', filename='edinpy.png')}}"/>
         <a href="/" class="navbar-brand me-auto p-1 bd-highlight"><h2>Education In Python</h2></a>
         <a href="/lessons" type="lesson" class="btn lessons">Уроки</a>
-        <a href="/about_us" type="lesson" class="btn about_us">О нас</a>
         <a href="/check_solutions" type="lesson" class="btn solutions">Заявки</a>
         {% if current_user.is_authenticated %}
         <a class="btn rating" href="/rating">Рейтинг</a>
@@ -76,5 +84,11 @@
 <main role="main" class="container">
     {% block content %}{% endblock %}
 </main>
+<div id="footer">
+    <div class="container ms-auto">
+        &copy; 2025 Education In Python
+        <a href="/about_us" type="lesson" class="btn about_us">О нас</a>
+    </div>
+</div>
 </body>
 </html>
