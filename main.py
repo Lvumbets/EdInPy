@@ -38,7 +38,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 @app.route('/')
 def index():
     '''Функция отображения стартовой страницы'''
-    return render_template('base.html')
+    return render_template('main_page.html')
 
 
 @app.route('/register_student', methods=['GET', 'POST'])
