@@ -12,13 +12,18 @@
         position:absolute;
         left:0px;
         }
-        .b {
+        .lb {
             position:absolute;
             bottom:5px;
             left:5px;
         }
         .d {
             margin-left: 39%;
+        }
+        .rb {
+            position:absolute;
+            bottom:5px;
+            right:5px;
         }
     </style>
 </head>
@@ -36,7 +41,8 @@
     <a type="button" class="btn btn-success" href="load_image">Загрузить изображение</a>
   </div>
 </div>
-<a class="btn btn-danger b" href="/logout">Выйти из аккаунта</a>
+<a class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
+<a class="btn btn-info rb" href="/change_password">Сменить пароль</a>
 </body>
 </html>
 {% endblock %}
