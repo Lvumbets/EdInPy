@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 from data import db_session
-from data.rest_api import lessons_resource
+from data.rest_api import lessons_resource, tasks_resource
 from data.admins import Admin
 from data.lessons import Lesson
 from data.solutions import Solution
@@ -362,6 +362,9 @@ def main():
     '''Функция запуска сайта'''
     api.add_resource(lessons_resource.LessonsListResource, '/api/lessons')  # api для списка уроков
     api.add_resource(lessons_resource.LessonResource, '/api/lessons/<int:lesson_id>')  # api для конкретного урока
+
+    api.add_resource(tasks_resource.TaskListResource, '/api/tasks')  # api для списка задач
+    api.add_resource(tasks_resource.TaskResource, '/api/tasks/<int:task_id>')  # api для конкретной задачи
 
     config.update_teachers_passwords()  # получение новых кодов для учителей
     config.update_admins_passwords()  # получение новых кодов для админов

@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_restful import Resource, abort
 
 from data import db_session
-from data.rest_api.lesson_regparser import parser
+from data.rest_api.regparser import lesson_parser
 from data.lessons import Lesson
 
 
@@ -39,13 +39,13 @@ class LessonsListResource(Resource):
 
     def get(self):
         '''Функция ресурса получения всех уроков'''
-        session = db_session.create_session()
-        lessons = session.query(Lesson).all()
-        return jsonify({'lessons': [item.to_dict(only=('id', 'title', 'description')) for item in lessons]})
+        db_sess = db_session.create_session()
+        lessons = db_sess.query(Lesson).all()
+        return jsonify({'lessons': [lesson.to_dict(only=('id', 'title', 'description')) for lesson in lessons]})
 
     def post(self):
         '''Функция ресурса для добавления нового урока в список уроков'''
-        args = parser.parse_args()
+        args = lesson_parser.parse_args()
         db_sess = db_session.create_session()
         lesson = Lesson(
             title=args['title'],
