@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import uuid
 
 from flask import Flask, render_template, redirect, make_response, jsonify, abort, request
@@ -426,9 +427,41 @@ def load_user(id):
         return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
 
+class Page:
+    def __init__(self, link, name=None, enabled=True):
+        self.name = name
+        self.link = link
+        self.enabled = enabled
+
+
 @app.route('/rating')
 def rating():
-    return render_template('rating.html')
+    page_arg = request.args.get('page')
+    if not page_arg:
+        page_arg = 0
+    else:
+        page_arg = int(page_arg) - 1
+    page_limit = 20
+    with db_session.create_session() as dbs:
+        cnt = dbs.query(Student).count()
+        if page_arg * page_limit >= cnt:
+            return redirect('rating')
+        users = dbs.query(Student).order_by(Student.completed_tasks.desc(), Student.surname.asc(),
+                                            Student.name.asc()).limit(page_limit).offset(page_arg * page_limit)
+        pages = []
+        for i in range(page_arg - 2, page_arg + 3):
+            if i >= 0 and i * page_limit < cnt:
+                page = Page(f"/rating?page={i + 1}", i + 1)
+                if i == page_arg:
+                    page.enabled = False
+                pages.append(page)
+        prev_page = Page(f"/rating?page={page_arg}")
+        next_page = Page(f"/rating?page={page_arg + 2}")
+        if page_arg - 1 < 0:
+            prev_page.enabled = False
+        if (page_arg + 1) * page_limit >= cnt:
+            next_page.enabled = False
+        return render_template('rating.html', users=users, pages=pages, prev_page=prev_page, next_page=next_page)
 
 
 @app.route('/logout')
