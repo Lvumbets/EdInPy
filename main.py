@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 from data import db_session
+from data.lesson_books import LessonBook
 from data.rest_api import lessons_resource, tasks_resource
 from data.admins import Admin
 from data.lessons import Lesson
@@ -18,6 +19,7 @@ from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin, RegisterAdmin
 from forms.lesson import LessonEdit, LessonAdd
+from forms.lesson_book import LessonBookAdd, LessonBookEdit
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
 from forms.teacher import RegisterTeacher, LoginTeacher
@@ -206,13 +208,13 @@ def lessons():
 @app.route("/lessons/<int:lesson_id>/tasks")
 def show_lesson(lesson_id):
     '''Функция отображения урока и его задача'''
-    db_sess = db_session.create_session()
-    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
-    tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
-    is_admin = table_now == Admin
+    with db_session.create_session() as db_sess:
+        lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
+        tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
+        is_admin = table_now == Admin
 
-    return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
-                           is_admin=is_admin)  # отображение урока и его задач
+        return render_template(f'lesson.html', lesson=lesson, tasks=tasks, books=lesson.books,
+                               is_admin=is_admin)  # отображение урока и его задач
 
 
 @app.route('/lessons/add', methods=['GET', 'POST'])
@@ -260,6 +262,79 @@ def delete_lesson(lesson_id):
     db_sess.delete(lesson)
     db_sess.commit()
     return redirect('/lessons')
+
+
+@app.route("/books/<int:book_id>")
+def show_book(book_id):
+    """Функция отображения выбранного учебника"""
+    with db_session.create_session() as dbs:
+        book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
+        if not book:
+            return redirect('/lessons')
+
+        return render_template(f'lesson_book.html', book=book)
+
+
+@app.route('/lessons/<int:lesson_id>/books/add', methods=['GET', 'POST'])
+@login_required
+def add_lesson_book(lesson_id):
+    """Функция страницы добавления нового учебника"""
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons/{lesson_id}/tasks')
+    form = LessonBookAdd()  # форма добавления учебника
+    if form.validate_on_submit():  # если нажата кнопка submit
+        with db_session.create_session() as dbs:
+            book = LessonBook(
+                title=form.title.data,
+                description=form.description.data,
+                text_template=form.text_template.data,
+                lesson_id=lesson_id
+            )
+            dbs.add(book)
+            dbs.commit()
+            return redirect(f'/lessons/{lesson_id}/tasks')
+    return render_template('add_lesson_book.html', form=form)
+
+
+@app.route('/lessons/<int:lesson_id>/books/edit/<int:book_id>', methods=['GET', 'POST'])
+@login_required
+def edit_lesson_book(lesson_id, book_id):
+    '''Функция страницы редактирования учебника'''
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons/{lesson_id}/tasks')
+    form = LessonBookEdit()
+    with db_session.create_session() as dbs:
+        book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
+        if not book:
+            return redirect(f'/lessons/{lesson_id}/tasks')
+        if form.validate_on_submit():  # если нажата кнопка submit
+            book.title = form.title.data
+            book.description = form.description.data
+            book.text_template = form.text_template.data
+            dbs.commit()
+            return redirect(f'/lessons/{lesson_id}/tasks')
+
+        # отображать данные этой задачи в форме изначально (для их изменения)
+        form.title.data = book.title
+        form.description.data = book.description
+        form.text_template.data = book.text_template
+
+    return render_template('edit_lesson_book.html', form=form)
+
+
+@app.route('/lessons/<int:lesson_id>/books/delete/<int:book_id>')
+@login_required
+def delete_lesson_book(lesson_id, book_id):
+    """Функция удаления учебника"""
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons/{lesson_id}/tasks')
+    with db_session.create_session() as dbs:
+        book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
+        if not book:
+            return redirect(f'/lessons/{lesson_id}/tasks')
+        dbs.delete(book)
+        dbs.commit()
+    return redirect(f'/lessons/{lesson_id}/tasks')
 
 
 @app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])

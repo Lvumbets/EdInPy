@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block content %}
+<h1>Редактирование учебника</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(class="form-control") }}<br>
+    </p>
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description(class="form-control") }}<br>
+    </p>
+    <p>
+        {{ form.text_template.label }}<br>
+        {{ form.text_template(class="form-control") }}<br>
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endblock %}
