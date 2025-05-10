@@ -8,28 +8,35 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/css/style.css">
     <style>
-        nav a.lessons {
-            margin-right: 5%;
+        nav a.main_page {
             width: 7em;
-            height: 3em;
+            height: 2em;
+            font-size: 150%;
+        }
+
+        nav a.lessons {
+            width: 7em;
+            height: 2em;
+            font-size: 150%;
+        }
+
+         nav a.solutions {
+            width: 14em;
+            height: 2em;
+            font-size: 150%;
+        }
+
+        nav a.rating {
+            width: 7em;
+            height: 2em;
+            font-size: 150%;
         }
 
         nav a.about_us {
-          margin-right: 5%;
           width: 35em;
           height: 7em;
         }
 
-         nav a.solutions {
-            margin-right: 5%;
-            width: 7em;
-            height: 3em;
-        }
-        nav a.rating {
-            margin-right: 25%;
-            width: 7em;
-            height: 3em;
-        }
         #footer {
             position: fixed; /* Фиксированное положение */
             left: 0; bottom: 0; /* Левый нижний угол */
@@ -48,12 +55,12 @@
             crossorigin="anonymous"></script>
     <nav class="navbar navbar-light bg-light d-flex bd-highlight mb-3">
         <a href="/"><img src="{{url_for('static', filename='edinpy.png')}}"/></a>
-        <a href="/lessons" type="lesson" class="btn btn-success lessons">Уроки</a>
-        <a href="/about_us" type="lesson" class="btn btn-success about_us">О нас</a>
-        <a href="/check_solutions" type="lesson" class="btn btn-success solutions">Заявки</a>
+        <a href="/" type="button" class="btn main_page">Главная</a>
+        <a href="/lessons" type="button" class="btn lessons">Уроки</a>
+        <a href="/check_solutions" type="button" class="btn solutions">Проверка решений</a>
+        <a href="/rating" type="button" class="btn rating">Рейтинг</a>
         {% if current_user.is_authenticated %}
-        <a class="btn rating" href="/rating">Рейтинг</a>
-        <a class="navbar-brand p-1 bd-highlight" href="/profile">{{ current_user.name }} {{ current_user.surname }}</a>
+        <a class="navbar-brand p-1 bd-highlight" href="/profile"><h3><b>{{ current_user.name }} {{ current_user.surname }}</b></h3></a>
         {% else %}
         <div class="dropdown p-1 bd-highlight">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"

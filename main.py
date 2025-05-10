@@ -34,7 +34,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = "static/upload"
 
 '''Глобальные переменные'''
-table_now = None  # изменить на None!!!
+table_now = Teacher  # изменить на None!!!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -312,7 +312,8 @@ def show_task(lesson_id, task_id):
                 is_solved = False
         else:  # если ещё не отправляли
             is_send = False
-
+        if table_now in [Teacher, Admin]:
+            is_send = False
         return render_template(f'task.html', form=task_form, task=task, examples=examples,
                                is_checked=is_checked, is_solved=is_solved, is_send=is_send)  # отображаем задачу
     return abort(404)  # задача не найдена
@@ -383,7 +384,7 @@ def show_solutions():
         for solution in solutions:
             student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
             task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
-            lst.append(((student.name, student.surname), task.title, solution.id))
+            lst.append(((student.name, student.surname), task.title, str(solution.student_id), solution.id))
         return render_template('check_solutions.html', solutions=lst)
     return redirect('/')
 
@@ -440,7 +441,15 @@ def logout():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html', user=current_user)
+    is_teacher = table_now == Teacher
+    if is_teacher:
+        db_sess = db_session.create_session()
+        students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split()))
+        lst = []
+        for student in students:
+            lst.append(db_sess.query(Student).filter(Student.id == student.id).first())
+        return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=lst)
+    return render_template('profile.html', user=current_user, is_teacher=is_teacher)
 
 
 @login_required

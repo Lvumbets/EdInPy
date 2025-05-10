@@ -12,15 +12,14 @@
     }
     div.lesson {
         display: flex;
-        align-items: start;
+        align-items: end;
         justify-content: center;
         flex-direction: column;
-        margin-bottom: 40px;
+        margin: 20px 25px;
     }
     a.lesson {
         width: 20em;
         height: 10em;
-        margin-right: 50px;
         font-weight: bold;
     }
     .lesson_buttons {
@@ -33,6 +32,7 @@
 </style>
 <form>
     <h1>Уроки</h1>
+    <br/>
     <div class="lessons">
         {% for lesson in lessons %}
         <div class="lesson">
@@ -47,6 +47,8 @@
         </div>
         {% endfor %}
     </div>
+    {% if is_admin %}
     <a href="/lessons/add" class="btn btn-success">Добавить урок</a>
+    {% endif %}
 </form>
 {% endblock %}

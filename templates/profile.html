@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Профиль {{ current_user.name }} {{ current_user.surname }}</title>
     <style>
         h1.t {
         width: 7em;
@@ -17,9 +16,11 @@
             bottom:5px;
             left:5px;
         }
+
         .d {
             margin-left: 39%;
         }
+
         .rb {
             position:absolute;
             bottom:5px;
@@ -30,20 +31,24 @@
 <body>
 <h1 style="margin-left: 0%">Профиль</h1>
 <div class="card d" style="width: 18rem;">
-  {% if current_user.image_name %}
-  <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=135px height=200px alt="Не удалось получить изображение" style="margin-left:25%">
-  {% endif %}
-  <div class="card-body">
-    <h1 class="card-title">{{ current_user.name }} {{ current_user.surname }}</h1>
-    <p class="card-text">Возраст: {{ current_user.age }}</p>
-    <p class="card-text">Почта: {{ current_user.email }}</p>
-    <p class="card-text">Рейтинг: {{ current_user.completed_tasks }}</p>
-    <p class="card-text">Ваш id: {{ current_user.id }}</p>
-    <a type="button" class="btn btn-success" href="load_image">Загрузить изображение</a>
-  </div>
+    {% if current_user.image_name %}
+    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=135px height=200px
+         alt="Не удалось получить изображение" style="margin-left:25%">
+    {% endif %}
+    <div class="card-body">
+        <h2 class="card-title" style="text-align:center">{{ current_user.name }} {{ current_user.surname }}</h2>
+        <p class="card-text"><b>Возраст:</b> {{ current_user.age }}</p>
+        <p class="card-text"><b>Почта:</b> {{ current_user.email }}</p>
+        <p class="card-text"><b>Рейтинг:</b> {{ current_user.completed_tasks }}</p>
+        <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
+        {% if is_teacher %}
+        <p class="card-text"><b>Ваши ученики:</b> {{ lst|join(", ") }}</p>
+        {% endif %}
+        <a type="button" class="btn btn-success" href="/load_image">Загрузить изображение</a>
+    </div>
 </div>
-<a class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
-<a class="btn btn-info rb" href="/change_password">Сменить пароль</a>
+<a type="button" class="btn btn-info rb" href="/change_password">Сменить пароль</a>
+<a type="button" class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
 </body>
 </html>
 {% endblock %}

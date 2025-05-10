@@ -1,13 +1,26 @@
 {% extends "base.html" %} {% block content %}
+<style>
+    div.solutions {
+        display: flex
+    }
+
+    .solution {
+        border: 3px solid black;
+        margin: 0px 10px;
+        padding: 5px 10px;
+    }
+</style>
 <form>
-    <link rel="stylesheet" href="../static/css/style.css">
-    <div class="grid text-center" style="display: flex">
+    <h1>Задачи на проверку</h1>
+    <div class="grid text-center solutions">
         {% for solution in solutions %}
-        <div style="border: 3px solid black;">
+        {% if solution[2] in current_user.students.split() %}
+        <div class="solution">
             <h3>{{solution[1]}}</h3>
             <a href="check_solutions/{{ solution[2] }}" type="button" class="btn btn-outline-secondary">{{solution[0][0]}}
                 {{solution[0][1]}}</a>
         </div>
+        {% endif %}
         {% endfor %}
     </div>
 </form>

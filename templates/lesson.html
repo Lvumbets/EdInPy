@@ -15,12 +15,11 @@
         align-items: start;
         justify-content: center;
         flex-direction: column;
-        margin-bottom: 40px;
+        margin: 20px 25px;
     }
     a.task {
         width: 20em;
         height: 10em;
-        margin-right: 50px;
         font-weight: bold;
     }
     .task_buttons {
@@ -47,6 +46,8 @@
         </div>
         {% endfor %}
     </div>
+    {% if is_admin %}
     <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success">Добавить задачу</a>
+    {% endif %}
 </form>
 {% endblock %}

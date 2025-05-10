@@ -10,7 +10,7 @@ class RegisterTeacher(FlaskForm):
     surname = StringField('Фамилия', validators=[DataRequired()])
     age = StringField('Возраст', validators=[DataRequired()])
 
-    students = StringField('Ученики (узнайте у уже зарегистрированных учеников)')
+    students = StringField('Ученики (узнайте id у своих учеников и введите их через пробел)')
 
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
