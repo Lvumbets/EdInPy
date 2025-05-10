@@ -24,17 +24,6 @@ form.lessons {
     padding: 5px;
 }
 
-/* button {
-    color: #fff;
-    background-color: #73A353;
-    width: 10em;
-    height: 20em;
-    --bs-btn-padding-y: .100rem;
-    --bs-btn-padding-x: .5rem;
-    --bs-btn-font-size: .75rem;
-
-} */
-
 }
 
 .task .lesson {
@@ -52,4 +41,12 @@ hr{
     background-color: black;
     color: red;
     height: 20px;
+}
+
+div.mycenter {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%;
+    padding: 10px;
 }
