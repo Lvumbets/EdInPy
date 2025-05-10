@@ -13,5 +13,6 @@ class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 
     title = sqlalchemy.Column(sqlalchemy.String)
+    description = sqlalchemy.Column(sqlalchemy.String)
 
     task = orm.relationship("Task")

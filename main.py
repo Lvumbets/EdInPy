@@ -15,8 +15,9 @@ from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
 from forms.admin import LoginAdmin, RegisterAdmin
+from forms.lesson import LessonEdit, LessonAdd
 from forms.student import RegisterStudent, LoginStudent
-from forms.task import TaskForm, CheckSolve
+from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
 from forms.teacher import RegisterTeacher, LoginTeacher
 from forms.change_password import Change_Password
 from static.config import config
@@ -30,7 +31,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = "static/upload"
 
 '''Глобальные переменные'''
-table_now = Student
+table_now = None  # изменить на None!!!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -189,27 +190,73 @@ def login_admin():
     return render_template('login_admin.html', form=form)  # отображении страницы логина админа
 
 
-@app.route('/about_us')
-def about_us():
-    '''Функция для отображения страницы "о нас"'''
-    return render_template('about_us.html')
-
-
 @app.route('/lessons')
 def lessons():
     '''Функция отображения уроков'''
     db_sess = db_session.create_session()
     less = db_sess.query(Lesson).all()  # получение всех уроков
-    return render_template('lessons.html', lessons=less)  # отображение страницы уроков
+    is_admin = table_now == Admin
+
+    return render_template('lessons.html', lessons=less, is_admin=is_admin)  # отображение страницы уроков
 
 
-@app.route("/lessons/<int:lesson_id>")
+@app.route("/lessons/<int:lesson_id>/tasks")
 def show_lesson(lesson_id):
     '''Функция отображения урока и его задача'''
     db_sess = db_session.create_session()
     lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
     tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
-    return render_template(f'lesson.html', lesson=lesson, tasks=tasks)  # отображение урока и его задач
+    is_admin = table_now == Admin
+
+    return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
+                           is_admin=is_admin)  # отображение урока и его задач
+
+
+@app.route('/lessons/add', methods=['GET', 'POST'])
+def add_lesson():
+    '''Функция страницы добавления нового урока'''
+    lesson_add = LessonAdd()
+    db_sess = db_session.create_session()
+
+    if lesson_add.submit.data:  # если нажата кнопка 'добавить'
+        lesson = Lesson(
+            title=lesson_add.title.data,
+            description=lesson_add.description.data,
+        )
+        db_sess.add(lesson)
+        db_sess.commit()
+        return redirect('/lessons')
+    return render_template('add_lesson.html', form=lesson_add)
+
+
+@app.route('/lessons/edit/<int:lesson_id>', methods=['GET', 'POST'])
+def edit_lesson(lesson_id):
+    '''Функция страницы редактирования урока'''
+    lesson_edit = LessonEdit()
+    db_sess = db_session.create_session()
+    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
+
+    if lesson_edit.submit.data:  # если нажали на кнопку 'сохранить'
+        lesson.title = lesson_edit.title.data
+        lesson.description = lesson_edit.description.data
+        db_sess.commit()
+        return redirect('/lessons')
+
+    # отображать данные этого урока в форме изначально (для их изменения)
+    lesson_edit.title.data = lesson.title
+    lesson_edit.description.data = lesson.description
+
+    return render_template('edit_lesson.html', form=lesson_edit)
+
+
+@app.route('/lessons/delete/<int:lesson_id>')
+def delete_lesson(lesson_id):
+    '''Функция удаления урока'''
+    db_sess = db_session.create_session()
+    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
+    db_sess.delete(lesson)
+    db_sess.commit()
+    return redirect('/lessons')
 
 
 @app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])
@@ -218,11 +265,14 @@ def show_task(lesson_id, task_id):
     db_sess = db_session.create_session()
     task = db_sess.query(Task).filter(Task.id == task_id).first()  # получение урока из дб
     if task:  # если урок найден
+        if not table_now:  # если пользователь зашёл на задачу, но не зарегистрирован => переводим на регистрацию
+            return redirect('/register_student')
+
         task_form = TaskForm()  # создание python формы
         examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров задачи
         old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
                                                       Solution.task_id == task.id).first()  # ищем старое решение
-        # пока нерабочий обработчик post запроса при нажатии на кнопку "отправить" в задаче
+
         if task_form.submit.data and table_now == Student:  # если отправил код ученик
             def add_new_solution():
                 '''Функция добавления нового решения'''
@@ -239,10 +289,10 @@ def show_task(lesson_id, task_id):
                 if not old_solution.is_solved:  # если оно неверное => удаляем старое и пропускаем новое решение
                     db_sess.delete(old_solution)
                     add_new_solution()
-                    return redirect(f'/lessons/{lesson_id}')
+                    return redirect(f'/lessons/{lesson_id}/tasks')
             else:  # если отправляем решение в первый раз
                 add_new_solution()
-                return redirect(f'/lessons/{lesson_id}')
+                return redirect(f'/lessons/{lesson_id}/tasks')
             return render_template(f'task.html', form=task_form, task=task, examples=examples,
                                    is_checked=old_solution.is_checked, is_solved=old_solution.is_solved, is_send=True)
 
@@ -261,8 +311,64 @@ def show_task(lesson_id, task_id):
             is_send = False
 
         return render_template(f'task.html', form=task_form, task=task, examples=examples,
-                               is_checked=is_checked, is_solved=is_solved, is_send=is_send)
-    return abort(404)  # урок не найден
+                               is_checked=is_checked, is_solved=is_solved, is_send=is_send)  # отображаем задачу
+    return abort(404)  # задача не найдена
+
+
+@app.route('/lessons/<int:lesson_id>/tasks/add', methods=['GET', 'POST'])
+def add_task(lesson_id):
+    '''Функция страницы добавления новой задачи'''
+    task_add = TaskAdd()
+    db_sess = db_session.create_session()
+
+    if task_add.submit.data:  # если нажата кнопка 'добавить'
+        task = Task(
+            title=task_add.title.data,
+            condition=task_add.condition.data,
+            examples=task_add.examples.data,
+            less_id=lesson_id
+        )
+        db_sess.add(task)
+        db_sess.commit()
+        return redirect(f'/lessons/{lesson_id}/tasks')
+    return render_template('add_task.html', form=task_add)
+
+
+@app.route('/lessons/<int:lesson_id>/tasks/edit/<int:task_id>', methods=['GET', 'POST'])
+def edit_task(lesson_id, task_id):
+    '''Функция страницы редактирования урока'''
+    task_edit = TaskEdit()
+    db_sess = db_session.create_session()
+    task = db_sess.query(Task).filter(Task.id == task_id).first()
+    max_id = [lesson.id for lesson in db_sess.query(Task).all()]
+
+    if task_edit.submit.data:  # если нажали на кнопку 'сохранить'
+        if task_edit.less_id.data not in max_id:  # если написан номер несуществующего урока
+            return render_template('edit_task.html', form=task_edit, message='Такого урока не существует')
+        task.title = task_edit.title.data
+        task.condition = task_edit.condition.data
+        task.examples = task_edit.examples.data
+        task.less_id = task_edit.less_id.data
+        db_sess.commit()
+        return redirect(f'/lessons/{lesson_id}/tasks')
+
+    # отображать данные этой задачи в форме изначально (для их изменения)
+    task_edit.title.data = task.title
+    task_edit.condition.data = task.condition
+    task_edit.examples.data = task.examples
+    task_edit.less_id.data = task.less_id
+
+    return render_template('edit_task.html', form=task_edit)
+
+
+@app.route('/lessons/<int:lesson_id>/tasks/delete/<int:task_id>')
+def delete_task(lesson_id, task_id):
+    '''Функция удаления задачи'''
+    db_sess = db_session.create_session()
+    task = db_sess.query(Task).filter(Task.id == task_id).first()
+    db_sess.delete(task)
+    db_sess.commit()
+    return redirect(f'/lessons/{lesson_id}/tasks')
 
 
 @app.route('/check_solutions')
@@ -302,11 +408,18 @@ def show_solution(solution_id):
                            form=form)
 
 
+@app.route('/about_us')
+def about_us():
+    '''Функция для отображения страницы "о нас"'''
+    return render_template('about_us.html')
+
+
 @login_manager.user_loader
 def load_user(id):
     '''Функция авторизации пользователя в сессии'''
     db_sess = db_session.create_session()
-    return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
+    if table_now:
+        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
 
 
 @app.route('/rating')
@@ -351,7 +464,7 @@ def not_found(error):
 
 @app.errorhandler(400)
 def bad_request(_):
-    '''функция выброса ошибки о неправильном request запросе'''
+    '''Функция выброса ошибки о неправильном request запросе'''
     return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 

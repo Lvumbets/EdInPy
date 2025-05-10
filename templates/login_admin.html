@@ -11,7 +11,7 @@
         {{ form.password(class="form-control", type="password") }}<br>
     </p>
     <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+    <h3>{{ message }}</h3>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    <h2>{{ message }}</h2>
 </form>
 {% endblock %}
