@@ -13,8 +13,7 @@ class LessonBook(SqlAlchemyBase, SerializerMixin):
 
     title = sqlalchemy.Column(sqlalchemy.String)
     description = sqlalchemy.Column(sqlalchemy.String)
-    text_template = sqlalchemy.Column(sqlalchemy.String)
 
     lesson_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("lessons.id"), nullable=False)
 
-    lesson = orm.relationship("Lesson")
+    paragraphs = orm.relationship('LessonBookParagraph', backref='lesson_books', passive_deletes=True)

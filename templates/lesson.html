@@ -38,10 +38,10 @@
         {% for book in books %}
         <div class="row">
             <div class="col text-center">
-                <a href="/books/{{ book.id }}" >{{ book.title.capitalize() }}</a>
+                <a href="/books/{{ book.id }}" >{{ book.title }}</a>
                 {% if is_admin %}</br>
-                <a href="/lessons/{{ lesson.id }}/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
-                <a href="/lessons/{{ lesson.id }}/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
+                <a href="/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
+                <a href="/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
                 {% endif %}
             </div>
             <div class="col text-left">

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 from data import db_session
+from data.lesson_book_paragraphs import LessonBookParagraph, PARAGRAPH_TYPE_IMAGE, PARAGRAPH_TYPE_TEXT
 from data.lesson_books import LessonBook
 from data.rest_api import lessons_resource, tasks_resource
 from data.admins import Admin
@@ -20,6 +21,8 @@ from data.teachers import Teacher
 from forms.admin import LoginAdmin, RegisterAdmin
 from forms.lesson import LessonEdit, LessonAdd
 from forms.lesson_book import LessonBookAdd, LessonBookEdit
+from forms.lesson_book_paragraph import LessonBookParagraphAdd, LessonBookParagraphEdit, LessonBookImageAdd, \
+    LessonBookImageEdit
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
 from forms.teacher import RegisterTeacher, LoginTeacher
@@ -269,10 +272,13 @@ def show_book(book_id):
     """Функция отображения выбранного учебника"""
     with db_session.create_session() as dbs:
         book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
+        book.paragraphs.sort(key=lambda x: x.position)  # для подгрузки разделов
         if not book:
             return redirect('/lessons')
 
-        return render_template(f'lesson_book.html', book=book)
+        is_admin = current_user.__class__ == Admin
+        return render_template(f'lesson_book.html', book=book, is_admin=is_admin,
+                               PARAGRAPH_TYPE_IMAGE=PARAGRAPH_TYPE_IMAGE, PARAGRAPH_TYPE_TEXT=PARAGRAPH_TYPE_TEXT)
 
 
 @app.route('/lessons/<int:lesson_id>/books/add', methods=['GET', 'POST'])
@@ -287,7 +293,6 @@ def add_lesson_book(lesson_id):
             book = LessonBook(
                 title=form.title.data,
                 description=form.description.data,
-                text_template=form.text_template.data,
                 lesson_id=lesson_id
             )
             dbs.add(book)
@@ -296,45 +301,154 @@ def add_lesson_book(lesson_id):
     return render_template('add_lesson_book.html', form=form)
 
 
-@app.route('/lessons/<int:lesson_id>/books/edit/<int:book_id>', methods=['GET', 'POST'])
+@app.route('/books/edit/<int:book_id>', methods=['GET', 'POST'])
 @login_required
-def edit_lesson_book(lesson_id, book_id):
+def edit_lesson_book(book_id):
     '''Функция страницы редактирования учебника'''
     if current_user.__class__ != Admin:
-        return redirect(f'/lessons/{lesson_id}/tasks')
+        return redirect(f'/lessons')
     form = LessonBookEdit()
     with db_session.create_session() as dbs:
         book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
+        book.paragraphs.sort(key=lambda x: x.position)  # для подгрузки разделов
+
         if not book:
-            return redirect(f'/lessons/{lesson_id}/tasks')
+            return redirect(f'/lessons')
         if form.validate_on_submit():  # если нажата кнопка submit
             book.title = form.title.data
             book.description = form.description.data
-            book.text_template = form.text_template.data
             dbs.commit()
-            return redirect(f'/lessons/{lesson_id}/tasks')
+            return redirect(f'/lessons/{book.lesson_id}/tasks')
 
-        # отображать данные этой задачи в форме изначально (для их изменения)
+        # отображать данные в форме изначально (для их изменения)
         form.title.data = book.title
         form.description.data = book.description
-        form.text_template.data = book.text_template
 
-    return render_template('edit_lesson_book.html', form=form)
+    return render_template('edit_lesson_book.html', form=form, book=book, PARAGRAPH_TYPE_IMAGE=PARAGRAPH_TYPE_IMAGE,
+                           PARAGRAPH_TYPE_TEXT=PARAGRAPH_TYPE_TEXT)
 
 
-@app.route('/lessons/<int:lesson_id>/books/delete/<int:book_id>')
+@app.route('/books/delete/<int:book_id>')
 @login_required
-def delete_lesson_book(lesson_id, book_id):
+def delete_lesson_book(book_id):
     """Функция удаления учебника"""
     if current_user.__class__ != Admin:
-        return redirect(f'/lessons/{lesson_id}/tasks')
+        return redirect(f'/lessons')
     with db_session.create_session() as dbs:
         book = dbs.query(LessonBook).filter(LessonBook.id == book_id).first()
         if not book:
-            return redirect(f'/lessons/{lesson_id}/tasks')
+            return redirect(f'/lessons')
         dbs.delete(book)
         dbs.commit()
-    return redirect(f'/lessons/{lesson_id}/tasks')
+    return redirect(f'/lessons/{book.lesson_id}/tasks')
+
+
+@app.route('/books/<int:book_id>/book_paragraphs/add', methods=['GET', 'POST'])
+@login_required
+def add_book_paragraph(book_id):
+    """Функция страницы добавления раздела учебника"""
+    if current_user.__class__ != Admin:
+        return redirect(f'/books/{book_id}')
+    form = LessonBookParagraphAdd()  # форма добавления раздела учебника
+    if form.validate_on_submit():  # если нажата кнопка submit
+        with db_session.create_session() as dbs:
+            paragraph = LessonBookParagraph(
+                type=PARAGRAPH_TYPE_TEXT,
+                content=form.content.data,
+                position=form.position.data,
+                lesson_book_id=book_id
+            )
+            dbs.add(paragraph)
+            dbs.commit()
+            return redirect(f'/books/edit/{book_id}')
+    return render_template('add_book_paragraph.html', form=form)
+
+
+@app.route('/book_paragraphs/edit/<int:paragraph_id>', methods=['GET', 'POST'])
+@login_required
+def edit_book_paragraph(paragraph_id):
+    '''Функция страницы редактирования раздела учебника'''
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons')
+    form = LessonBookParagraphEdit()
+    with db_session.create_session() as dbs:
+        paragraph = dbs.query(LessonBookParagraph).filter(LessonBookParagraph.id == paragraph_id).first()
+
+        if not paragraph:
+            return redirect(f'/lessons')
+        if form.validate_on_submit():  # если нажата кнопка submit
+            paragraph.content = form.content.data
+            paragraph.position = form.position.data
+            dbs.commit()
+            return redirect(f'/books/edit/{paragraph.lesson_book_id}')
+
+        # отображать данные в форме изначально (для их изменения)
+        form.content.data = paragraph.content
+        form.position.data = paragraph.position
+
+    return render_template('edit_book_paragraph.html', form=form)
+
+
+@app.route('/books/<int:book_id>/book_paragraphs/add_image', methods=['GET', 'POST'])
+@login_required
+def add_book_paragraph_image(book_id):
+    """Функция страницы добавления изображения учебника"""
+    if current_user.__class__ != Admin:
+        return redirect(f'/books/{book_id}')
+    form = LessonBookImageAdd()  # форма добавления изображения
+    if form.validate_on_submit():  # если нажата кнопка submit
+        ext = form.image.data.filename.rsplit('.', 1)[1].lower()
+        filename = f'{str(uuid.uuid4())}.{ext}'
+        with db_session.create_session() as dbs:
+            paragraph = LessonBookParagraph(
+                type=PARAGRAPH_TYPE_IMAGE,
+                content=filename,
+                position=form.position.data,
+                lesson_book_id=book_id
+            )
+            dbs.add(paragraph)
+            dbs.commit()
+            form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
+            return redirect(f'/books/edit/{book_id}')
+    return render_template('add_book_image.html', form=form)
+
+
+@app.route('/book_paragraphs/edit_image/<int:paragraph_id>', methods=['GET', 'POST'])
+@login_required
+def edit_book_paragraph_image(paragraph_id):
+    '''Функция страницы редактирования раздела учебника'''
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons')
+    form = LessonBookImageEdit()
+    with db_session.create_session() as dbs:
+        paragraph = dbs.query(LessonBookParagraph).filter(LessonBookParagraph.id == paragraph_id).first()
+
+        if not paragraph:
+            return redirect(f'/lessons')
+        if form.validate_on_submit():  # если нажата кнопка submit
+            paragraph.position = form.position.data
+            dbs.commit()
+            return redirect(f'/books/edit/{paragraph.lesson_book_id}')
+
+        # отображать данные в форме изначально (для их изменения)
+        form.position.data = paragraph.position
+
+    return render_template('edit_book_image.html', form=form)
+
+
+@app.route('/book_paragraphs/delete/<int:paragraph_id>')
+@login_required
+def delete_book_paragraph(paragraph_id):
+    """Функция удаления раздела/изображения учебника"""
+    if current_user.__class__ != Admin:
+        return redirect(f'/lessons')
+    with db_session.create_session() as dbs:
+        paragraph = dbs.query(LessonBookParagraph).filter(LessonBookParagraph.id == paragraph_id).first()
+        if not paragraph:
+            return redirect(f'/lessons')
+        dbs.delete(paragraph)
+        dbs.commit()
+    return redirect(f'/books/edit/{paragraph.lesson_book_id}')
 
 
 @app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])
@@ -536,10 +650,11 @@ def load_image():
             ext = file.filename.rsplit('.', 1)[1].lower()
             filename = f'{str(uuid.uuid4())}.{ext}'
             with db_session.create_session() as dbs:
-                user = dbs.query(table_now).filter(current_user.id == table_now.id).first()
+                user = dbs.query(current_user.__class__).filter(current_user.id == table_now.id).first()
                 user.image_name = filename
                 dbs.commit()
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
+                return redirect('/profile')
     return render_template('load_image.html')
 
 
@@ -578,6 +693,29 @@ def change_password():
     return render_template('change_password.html', form=form)
 
 
+def remove_unused_uploaded_files():
+    """Функция удаления неиспользуемых загруженных файлов"""
+    path = os.path.join(app.config['UPLOAD_FOLDER'])
+    uploaded_files = set([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
+
+    used_images = set()
+    with db_session.create_session() as db_sess:
+        for cl in (Admin, Student, Teacher):
+            for i in db_sess.query(cl):
+                if i.image_name:
+                    used_images.add(i.image_name)
+        for i in db_sess.query(LessonBookParagraph).filter(LessonBookParagraph.type == PARAGRAPH_TYPE_IMAGE):
+            if i.content:
+                used_images.add(i.content)
+
+    print("Going to remove unused uploaded files:")
+
+    for i in uploaded_files - used_images:
+        file_path = os.path.join(path, i)
+        print("Removing", file_path)
+        os.remove(file_path)
+
+
 def main():
     '''Функция запуска сайта'''
     api.add_resource(lessons_resource.LessonsListResource, '/api/lessons')  # api для списка уроков
@@ -590,6 +728,8 @@ def main():
     config.update_admins_passwords()  # получение новых кодов для админов
 
     db_session.global_init('db/ed_in_py.sqlite')  # инициализация базы данных
+
+    remove_unused_uploaded_files()
 
     app.run()
 
