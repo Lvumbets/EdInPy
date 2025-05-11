@@ -31,6 +31,30 @@
     }
 </style>
 <form>
+    {% if books %}
+    <h1>Учебники</h1>
+    <div class="container w-50">
+        <hr>
+        {% for book in books %}
+        <div class="row">
+            <div class="col text-center">
+                <a href="/books/{{ book.id }}" >{{ book.title }}</a>
+                {% if is_admin %}</br>
+                <a href="/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
+                <a href="/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
+                {% endif %}
+            </div>
+            <div class="col text-left">
+                <p>{{ book.description }}</p>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if is_admin %}
+    <a href="/lessons/{{ lesson.id }}/books/add" class="btn btn-success">Добавить учебник</a>
+    {% endif %}
     <h1>Задачи</h1>
     <div class="tasks">
         {% for task in tasks %}

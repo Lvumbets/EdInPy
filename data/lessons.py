@@ -15,4 +15,5 @@ class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
     title = sqlalchemy.Column(sqlalchemy.String)
     description = sqlalchemy.Column(sqlalchemy.String)
 
+    books = orm.relationship("LessonBook")
     task = orm.relationship("Task")

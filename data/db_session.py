@@ -1,10 +1,16 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy import event
 from sqlalchemy.orm import Session
 
 SqlAlchemyBase = orm.declarative_base()
 
 __factory = None
+
+
+# Включение foreign_keys для каждого соединения
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    dbapi_connection.cursor().execute("PRAGMA foreign_keys=ON;")
 
 
 def global_init(db_file):
@@ -20,11 +26,13 @@ def global_init(db_file):
     print(f"Подключение к базе данных по адресу {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
+    event.listen(engine, 'connect', _set_sqlite_pragma)
     __factory = orm.sessionmaker(bind=engine)
 
     from . import __all_models
 
     SqlAlchemyBase.metadata.create_all(engine)
+
 
 def create_session() -> Session:
     global __factory
