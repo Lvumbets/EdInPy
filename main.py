@@ -20,7 +20,7 @@ from forms.admin import LoginAdmin, RegisterAdmin
 from forms.lesson import LessonEdit, LessonAdd
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
-from forms.teacher import RegisterTeacher, LoginTeacher
+from forms.teacher import RegisterTeacher, LoginTeacher, ChangeStudents
 from forms.change_password import Change_Password
 from static.config import config
 
@@ -34,7 +34,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = "static/upload"
 
 '''Глобальные переменные'''
-table_now = Teacher  # изменить на None!!!
+table_now = None  # изменить на None!!!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -66,6 +66,7 @@ def register_student():
         student.set_password(form.password.data)  # установка хэшированного пароля
         db_sess.add(student)  # добавление нового ученика в бд
         db_sess.commit()  # сохранения изменений в таблице
+        db_sess.close()  # конец сессии бд
         return redirect('/login_student')  # перевод на страницу с логином ученика
     return render_template('register_student.html', form=form)  # отображение страницы ученика
 
@@ -116,13 +117,17 @@ def register_teacher():
         db_sess.add(teacher)  # добавление учителя в бд
 
         '''Добавление id учителя к карточкам выбранных учеников'''
-        if len(form.students.data.split()):
-            for id in form.students.data.split():
-                student = db_sess.query(Student).filter(Student.id == id).first()
-                if student:
-                    student.teacher_id = teacher.id
+        try:
+            if len(form.students.data.split()):
+                for id in form.students.data.split():
+                    student = db_sess.query(Student).filter(Student.id == id).first()
+                    if student:
+                        student.teacher_id = teacher.id
+        except Exception:
+            return render_template('register_teacher.html', form=form, message='Данные об учениках введены неверно')
 
         db_sess.commit()  # сохранение изменений в бд
+        db_sess.close()
         return redirect('/login_teacher')  # перевод на авторизацию учителя
     return render_template('register_teacher.html', form=form)  # отображение страницы регистрации учителя
 
@@ -138,7 +143,9 @@ def login_teacher():
         if teacher and teacher.check_password(form.password.data):  # если учитель найден - логинимся
             table_now = Teacher  # выбор таблицы учителей для сессии
             login_user(teacher, remember=form.remember_me.data)  # логин учителя
+            db_sess.close()
             return redirect("/lessons")  # переходим на страницу уроков
+        db_sess.close()
         return render_template('login_teacher.html', form=form,
                                message="Неправильный логин или пароль")  # отображение ошибки
     return render_template('login_teacher.html', form=form)  # отображение страницы логина учителя
@@ -172,6 +179,7 @@ def register_admin():
         admin.set_password(form.password.data)  # установка пароля для админа
         db_sess.add(admin)  # добавление админа в бд
         db_sess.commit()  # сохранение изменений в бд
+        db_sess.close()
         return redirect('/login_admin')  # перевод на авторизацию админа
     return render_template('register_admin.html', form=form)  # отображение страницы регистрации админа
 
@@ -187,7 +195,9 @@ def login_admin():
         if admin and admin.check_password(form.password.data):  # если админ найден - логинимся
             table_now = Admin
             login_user(admin, remember=form.remember_me.data)  # логин админа в сессии
+            db_sess.close()
             return redirect("/lessons")  # переходим на страницу уроков
+        db_sess.close()
         return render_template('login_admin.html', form=form,
                                message="Неправильный логин или пароль")  # отображение ошибки
     return render_template('login_admin.html', form=form)  # отображении страницы логина админа
@@ -199,7 +209,7 @@ def lessons():
     db_sess = db_session.create_session()
     less = db_sess.query(Lesson).all()  # получение всех уроков
     is_admin = table_now == Admin
-
+    db_sess.close()
     return render_template('lessons.html', lessons=less, is_admin=is_admin)  # отображение страницы уроков
 
 
@@ -210,7 +220,7 @@ def show_lesson(lesson_id):
     lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
     tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
     is_admin = table_now == Admin
-
+    db_sess.close()
     return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
                            is_admin=is_admin)  # отображение урока и его задач
 
@@ -228,7 +238,9 @@ def add_lesson():
         )
         db_sess.add(lesson)
         db_sess.commit()
+        db_sess.close()
         return redirect('/lessons')
+    db_sess.close()
     return render_template('add_lesson.html', form=lesson_add)
 
 
@@ -243,12 +255,13 @@ def edit_lesson(lesson_id):
         lesson.title = lesson_edit.title.data
         lesson.description = lesson_edit.description.data
         db_sess.commit()
+        db_sess.close()
         return redirect('/lessons')
 
     # отображать данные этого урока в форме изначально (для их изменения)
     lesson_edit.title.data = lesson.title
     lesson_edit.description.data = lesson.description
-
+    db_sess.close()
     return render_template('edit_lesson.html', form=lesson_edit)
 
 
@@ -259,6 +272,7 @@ def delete_lesson(lesson_id):
     lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()
     db_sess.delete(lesson)
     db_sess.commit()
+    db_sess.close()
     return redirect('/lessons')
 
 
@@ -271,8 +285,14 @@ def show_task(lesson_id, task_id):
         if not table_now:  # если пользователь зашёл на задачу, но не зарегистрирован => переводим на регистрацию
             return redirect('/register_student')
 
-        task_form = TaskForm()  # создание python формы
-        examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров задачи
+        task_form = TaskForm()
+        try:
+            examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров
+        except Exception:  # если неправильно введены примеры
+            task.title = 'Задача в разработке!'
+            db_sess.commit()
+            return redirect(f'/lessons/{lesson_id}/tasks')
+
         old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
                                                       Solution.task_id == task.id).first()  # ищем старое решение
 
@@ -286,6 +306,7 @@ def show_task(lesson_id, task_id):
                 )
                 db_sess.add(solution)
                 db_sess.commit()
+                db_sess.close()
 
             # если есть старое решение и оно неправильное => заменить на новое
             if old_solution:  # если есть старое решение
@@ -296,8 +317,10 @@ def show_task(lesson_id, task_id):
             else:  # если отправляем решение в первый раз
                 add_new_solution()
                 return redirect(f'/lessons/{lesson_id}/tasks')
+            db_sess.close()
             return render_template(f'task.html', form=task_form, task=task, examples=examples,
-                                   is_checked=old_solution.is_checked, is_solved=old_solution.is_solved, is_send=True)
+                                   is_checked=old_solution.is_checked, is_solved=old_solution.is_solved,
+                                   is_send=True)
 
         is_checked, is_solved = False, False
         if old_solution:  # если решение было отправлено раньше
@@ -314,8 +337,15 @@ def show_task(lesson_id, task_id):
             is_send = False
         if table_now in [Teacher, Admin]:
             is_send = False
-        return render_template(f'task.html', form=task_form, task=task, examples=examples,
-                               is_checked=is_checked, is_solved=is_solved, is_send=is_send)  # отображаем задачу
+        try:
+            return render_template(f'task.html', form=task_form, task=task, examples=examples,
+                                   is_checked=is_checked, is_solved=is_solved, is_send=is_send)  # отображаем задачу
+        except Exception:
+            task.title = 'Задача в разработке!'
+            db_sess.commit()
+            return redirect(f'/lessons/{lesson_id}/tasks')
+
+    db_sess.close()
     return abort(404)  # задача не найдена
 
 
@@ -334,7 +364,9 @@ def add_task(lesson_id):
         )
         db_sess.add(task)
         db_sess.commit()
+        db_sess.close()
         return redirect(f'/lessons/{lesson_id}/tasks')
+    db_sess.close()
     return render_template('add_task.html', form=task_add)
 
 
@@ -344,16 +376,17 @@ def edit_task(lesson_id, task_id):
     task_edit = TaskEdit()
     db_sess = db_session.create_session()
     task = db_sess.query(Task).filter(Task.id == task_id).first()
-    max_id = [lesson.id for lesson in db_sess.query(Task).all()]
+    lessons_id = [lesson.id for lesson in db_sess.query(Task).all()]
 
     if task_edit.submit.data:  # если нажали на кнопку 'сохранить'
-        if task_edit.less_id.data not in max_id:  # если написан номер несуществующего урока
+        if task_edit.less_id.data not in lessons_id:  # если написан номер несуществующего урока
             return render_template('edit_task.html', form=task_edit, message='Такого урока не существует')
         task.title = task_edit.title.data
         task.condition = task_edit.condition.data
         task.examples = task_edit.examples.data
         task.less_id = task_edit.less_id.data
         db_sess.commit()
+        db_sess.close()
         return redirect(f'/lessons/{lesson_id}/tasks')
 
     # отображать данные этой задачи в форме изначально (для их изменения)
@@ -361,7 +394,7 @@ def edit_task(lesson_id, task_id):
     task_edit.condition.data = task.condition
     task_edit.examples.data = task.examples
     task_edit.less_id.data = task.less_id
-
+    db_sess.close()
     return render_template('edit_task.html', form=task_edit)
 
 
@@ -372,11 +405,13 @@ def delete_task(lesson_id, task_id):
     task = db_sess.query(Task).filter(Task.id == task_id).first()
     db_sess.delete(task)
     db_sess.commit()
+    db_sess.close()
     return redirect(f'/lessons/{lesson_id}/tasks')
 
 
 @app.route('/check_solutions')
 def show_solutions():
+    '''Функция отображения решений учеников'''
     if table_now == Teacher:
         db_sess = db_session.create_session()
         solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
@@ -385,6 +420,7 @@ def show_solutions():
             student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
             task = db_sess.query(Task).filter(Task.id == solution.task_id).first()
             lst.append(((student.name, student.surname), task.title, str(solution.student_id), solution.id))
+        db_sess.close()
         return render_template('check_solutions.html', solutions=lst)
     return redirect('/')
 
@@ -407,7 +443,9 @@ def show_solution(solution_id):
             solution.is_checked = True  # проверена
             solution.is_solved = False  # не решена
         db_sess.commit()
+        db_sess.close()
         return redirect('/check_solutions')
+    db_sess.close()
     return render_template('check_solution.html', solution=solution, student=student, task=task, examples=examples,
                            form=form)
 
@@ -418,43 +456,27 @@ def about_us():
     return render_template('about_us.html')
 
 
-@login_manager.user_loader
-def load_user(id):
-    '''Функция авторизации пользователя в сессии'''
-    db_sess = db_session.create_session()
-    if table_now:
-        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
-
-
 @app.route('/rating')
 def rating():
+    '''Функция страницы рейтинга'''
     return render_template('rating.html')
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    '''Функция деавторизации пользователя'''
-    logout_user()
-    return redirect("/")
 
 
 @app.route('/profile')
 def profile():
     is_teacher = table_now == Teacher
-    if is_teacher:
+    if is_teacher:  # если авторизован учитель => получаем id его учеников и находим их
         db_sess = db_session.create_session()
         students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split()))
-        lst = []
-        for student in students:
-            lst.append(db_sess.query(Student).filter(Student.id == student.id).first())
+        lst = [db_sess.query(Student).filter(Student.id == student.id).first() for student in students]
+        db_sess.close()
         return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=lst)
     return render_template('profile.html', user=current_user, is_teacher=is_teacher)
 
 
-@login_required
 @app.route('/load_image', methods=['POST', 'GET'])
 def load_image():
+    '''Функция загрузки изображений'''
     if request.method == 'POST':
         file = request.files['file']
         if file.filename:
@@ -468,20 +490,36 @@ def load_image():
     return render_template('load_image.html')
 
 
-@app.errorhandler(404)
-def not_found(error):
-    '''Функция выброса ошибки о ненайденной странице'''
-    return make_response(jsonify({'error': 'Not found'}), 404)
+@app.route('/change_students', methods=['POST', 'GET'])
+def change_students():
+    '''Функция изменения учеников учителя'''
+    form = ChangeStudents()
+    db_sess = db_session.create_session()
+    teacher = db_sess.query(Teacher).filter(Teacher.id == current_user.id).first()
 
+    if form.submit.data:  # если нажата кнопка 'сохранить'
+        teacher.students = form.students.data
 
-@app.errorhandler(400)
-def bad_request(_):
-    '''Функция выброса ошибки о неправильном request запросе'''
-    return make_response(jsonify({'error': 'Bad Request'}), 400)
+        """Привязывание учеников к учителю"""
+        try:
+            if len(teacher.students.split()):
+                for student_id in teacher.students.split():
+                    student = db_sess.query(Student).filter(Student.id == student_id).first()
+                    if student:
+                        student.teacher_id = teacher.id
+        except Exception:
+            return render_template('change_students.html', form=form, message='Данные введены неверно')
+
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/profile')
+
+    form.students.data = teacher.students
+    db_sess.close()
+    return render_template('change_students.html', form=form)
 
 
 @app.route('/change_password', methods=['POST', 'GET'])
-@login_required
 def change_password():
     '''Функция изменения пароля'''
     form = Change_Password()  # форма изменения пароля
@@ -501,6 +539,34 @@ def change_password():
             dbs.commit()
         return redirect('/profile')  # перевод на профиль
     return render_template('change_password.html', form=form)
+
+
+@login_manager.user_loader
+def load_user(id):
+    '''Функция авторизации пользователя в сессии'''
+    db_sess = db_session.create_session()
+    if table_now:
+        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    '''Функция деавторизации пользователя'''
+    logout_user()
+    return redirect("/")
+
+
+@app.errorhandler(404)
+def not_found(error):
+    '''Функция выброса ошибки о ненайденной странице'''
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    '''Функция выброса ошибки о неправильном request запросе'''
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
 def main():

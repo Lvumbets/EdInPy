@@ -43,6 +43,7 @@
         <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
         {% if is_teacher %}
         <p class="card-text"><b>Ваши ученики:</b> {{ lst|join(", ") }}</p>
+        <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Ваши ученики</a>
         {% endif %}
         <a type="button" class="btn btn-success" href="/load_image">Загрузить изображение</a>
     </div>
