@@ -30,22 +30,22 @@
         width: 10em;
     }
 </style>
-<form>
-    {% if lesson.books %}
+<form action="">
     <h1>Учебники</h1>
+    {% if lesson.books %}
     <div class="container w-50">
         <hr>
         {% for book in lesson.books %}
         <div class="row">
             <div class="col text-center">
-                <a href="/books/{{ book.id }}" >{{ book.title }}</a>
+                <a href="/books/{{ book.id }}" style="text-decoration: none"><h3>{{ book.title }}</h3></a>
                 {% if is_admin %}</br>
                 <a href="/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
                 <a href="/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
                 {% endif %}
             </div>
             <div class="col text-left">
-                <p>{{ book.description }}</p>
+                <h4>{{ book.description }}</h4>
             </div>
         </div>
         <hr>
@@ -53,6 +53,7 @@
     </div>
     {% endif %}
     {% if is_admin %}
+    <br>
     <a href="/lessons/{{ lesson.id }}/books/add" class="btn btn-success">Добавить учебник</a>
     {% endif %}
     <h1>Задачи</h1>
@@ -73,5 +74,6 @@
     {% if is_admin %}
     <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success">Добавить задачу</a>
     {% endif %}
+    <hr>
 </form>
 {% endblock %}

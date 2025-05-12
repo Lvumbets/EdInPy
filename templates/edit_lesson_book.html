@@ -10,24 +10,26 @@
         {{ form.description.label }}<br>
         {{ form.description(class="form-control") }}<br>
     </p>
+    <a href="/books/{{ book.id }}/book_paragraphs/add_image" class="btn btn-success">Добавить изображение</a>
+    <a href="/books/{{ book.id }}/book_paragraphs/add" class="btn btn-success">Добавить раздел</a>
+    <hr>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+
+    {% if book.paragraphs %}
+    <hr>
+    {% for paragraph in book.paragraphs %}
+    {% if paragraph.type == PARAGRAPH_TYPE_TEXT %}
+    {{ paragraph.content | safe}}<br>
+    Position: {{ paragraph.position }}
+    <a href="/book_paragraphs/edit/{{ paragraph.id }}" class="btn btn-warning">Изменить</a>
+    {% elif paragraph.type == PARAGRAPH_TYPE_IMAGE %}
+    <img src="/static/upload/{{ paragraph.content }}"/><br>
+    Position: {{ paragraph.position }}
+    <a href="/book_paragraphs/edit_image/{{ paragraph.id }}" class="btn btn-warning">Изменить</a>
+    {% endif %}
+    <a href="/book_paragraphs/delete/{{ paragraph.id }}" class="btn btn-danger">Удалить</a>
+    <hr>
+    {% endfor %}
+    {% endif %}
 </form>
-{% if book.paragraphs %}
-<hr>
-{% for paragraph in book.paragraphs %}
-{% if paragraph.type == PARAGRAPH_TYPE_TEXT %}
-{{ paragraph.content | safe}}<br>
-Position: {{ paragraph.position }}
-<a href="/book_paragraphs/edit/{{ paragraph.id }}" class="btn btn-warning">Изменить</a>
-{% elif paragraph.type == PARAGRAPH_TYPE_IMAGE %}
-<img src="/static/upload/{{ paragraph.content }}"/><br>
-Position: {{ paragraph.position }}
-<a href="/book_paragraphs/edit_image/{{ paragraph.id }}" class="btn btn-warning">Изменить</a>
-{% endif %}
-<a href="/book_paragraphs/delete/{{ paragraph.id }}" class="btn btn-danger">Удалить</a>
-<hr>
-{% endfor %}
-{% endif %}
-<a href="/books/{{ book.id }}/book_paragraphs/add_image" class="btn btn-success">Добавить изображение</a>
-<a href="/books/{{ book.id }}/book_paragraphs/add" class="btn btn-success">Добавить раздел</a>
 {% endblock %}
