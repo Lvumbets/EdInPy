@@ -31,11 +31,11 @@
     }
 </style>
 <form>
-    {% if books %}
+    {% if lesson.books %}
     <h1>Учебники</h1>
     <div class="container w-50">
         <hr>
-        {% for book in books %}
+        {% for book in lesson.books %}
         <div class="row">
             <div class="col text-center">
                 <a href="/books/{{ book.id }}" >{{ book.title }}</a>

@@ -222,13 +222,12 @@ def lessons():
 @app.route("/lessons/<int:lesson_id>/tasks")
 def show_lesson(lesson_id):
     '''Функция отображения урока и его задача'''
-    db_sess = db_session.create_session()
-    lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
-    tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
-    is_admin = table_now == Admin
-    db_sess.close()
-    return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
-                           is_admin=is_admin)  # отображение урока и его задач
+    with db_session.create_session() as db_sess:
+        lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
+        tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
+        is_admin = table_now == Admin
+        return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
+                               is_admin=is_admin)  # отображение урока и его задач
 
 
 @app.route('/lessons/add', methods=['GET', 'POST'])
@@ -664,7 +663,6 @@ class Page:
 @app.route('/rating')
 def rating():
     '''Функция страницы рейтинга'''
-    return render_template('rating.html')
     page_arg = request.args.get('page')
     if not page_arg:
         page_arg = 0
