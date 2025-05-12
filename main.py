@@ -683,6 +683,7 @@ def rating():
 
 
 @app.route('/profile')
+@login_required
 def profile():
     is_teacher = current_user.__class__ == Teacher
     if is_teacher:  # если авторизован учитель => получаем id его учеников и находим их
@@ -764,7 +765,7 @@ def change_password():
             return render_template('change_password.html', form=form,
                                    message="Новый и Текущий пароль совпадают")  # отображение ошибки
         with db_session.create_session() as db_sess:
-            user = db_sess.query(table_now).filter(current_user.id == current_user.__class__.id).first()
+            user = db_sess.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
             user.set_password(form.new_password.data)
             db_sess.commit()
         return redirect('/profile')  # перевод на профиль
