@@ -5,6 +5,7 @@ from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db_session import SqlAlchemyBase
+from .users import USER_STUDENT
 
 
 class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -39,3 +40,6 @@ class Student(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def get_id(self):
+        return f"{self.id}|{USER_STUDENT}"

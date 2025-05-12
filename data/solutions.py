@@ -6,7 +6,7 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Solution(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Solution(SqlAlchemyBase, SerializerMixin):
     '''SQL база данных для решений'''
     __tablename__ = 'solutions'
 

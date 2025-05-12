@@ -6,7 +6,7 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Task(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Task(SqlAlchemyBase, SerializerMixin):
     '''SQL база данных задач'''
     __tablename__ = 'tasks'
 

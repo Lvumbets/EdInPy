@@ -5,6 +5,8 @@ from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db_session import SqlAlchemyBase
+from .users import USER_TEACHER
+
 
 class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
     '''SQL база данных для учителей'''
@@ -35,3 +37,6 @@ class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def get_id(self):
+        return f"{self.id}|{USER_TEACHER}"

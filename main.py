@@ -19,6 +19,7 @@ from data.solutions import Solution
 from data.students import Student
 from data.tasks import Task
 from data.teachers import Teacher
+from data.users import USER_ADMIN, USER_STUDENT, USER_TEACHER
 from forms.admin import LoginAdmin, RegisterAdmin
 from forms.lesson import LessonEdit, LessonAdd
 from forms.lesson_book import LessonBookAdd, LessonBookEdit
@@ -38,9 +39,6 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config['UPLOAD_FOLDER'] = "static/upload"
-
-'''Глобальные переменные'''
-table_now = None  # изменить на None!!!
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -80,13 +78,11 @@ def register_student():
 @app.route('/login_student', methods=['GET', 'POST'])
 def login_student():
     '''Функция логина ученика'''
-    global table_now  # глобальная переменная для сессии
     form = LoginStudent()  # форма логина ученика
     if form.validate_on_submit():  # если нажали на кнопку авторизации
         db_sess = db_session.create_session()
         student = db_sess.query(Student).filter(Student.email == form.email.data).first()  # ищем ученика в дб
         if student and student.check_password(form.password.data):  # если логин и пароль совпадают
-            table_now = Student  # сессию на сайте для пользователя из таблицы учеников
             login_user(student, remember=form.remember_me.data)  # авторизация ученика
             return redirect("/lessons")  # перейти в список уроков
         return render_template('login_student.html', form=form,
@@ -141,13 +137,11 @@ def register_teacher():
 @app.route('/login_teacher', methods=['GET', 'POST'])
 def login_teacher():
     '''Функция логина учителя'''
-    global table_now  # переменная с таблицей, из которой надо авторизовать пользователя в сессии
     form = LoginTeacher()  # форма логина учителя
     if form.validate_on_submit():  # при нажатии на кнопку
         db_sess = db_session.create_session()
         teacher = db_sess.query(Teacher).filter(Teacher.email == form.email.data).first()  # поиск учителя по бд
         if teacher and teacher.check_password(form.password.data):  # если учитель найден - логинимся
-            table_now = Teacher  # выбор таблицы учителей для сессии
             login_user(teacher, remember=form.remember_me.data)  # логин учителя
             db_sess.close()
             return redirect("/lessons")  # переходим на страницу уроков
@@ -193,13 +187,11 @@ def register_admin():
 @app.route('/login_admin', methods=['GET', 'POST'])
 def login_admin():
     '''Функция логина администратора'''
-    global table_now  # переменная с таблицей, из которой надо авторизовать пользователя в сессии
     form = LoginAdmin()  # форма логина админа
     if form.validate_on_submit():  # при нажатии на кнопку
         db_sess = db_session.create_session()
         admin = db_sess.query(Admin).filter(Admin.email == form.email.data).first()  # поиск админа по бд
         if admin and admin.check_password(form.password.data):  # если админ найден - логинимся
-            table_now = Admin
             login_user(admin, remember=form.remember_me.data)  # логин админа в сессии
             db_sess.close()
             return redirect("/lessons")  # переходим на страницу уроков
@@ -214,7 +206,7 @@ def lessons():
     '''Функция отображения уроков'''
     db_sess = db_session.create_session()
     less = db_sess.query(Lesson).all()  # получение всех уроков
-    is_admin = table_now == Admin
+    is_admin = current_user.__class__ == Admin
     db_sess.close()
     return render_template('lessons.html', lessons=less, is_admin=is_admin)  # отображение страницы уроков
 
@@ -225,7 +217,7 @@ def show_lesson(lesson_id):
     with db_session.create_session() as db_sess:
         lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
         tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
-        is_admin = table_now == Admin
+        is_admin = current_user.__class__ == Admin
         return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
                                is_admin=is_admin)  # отображение урока и его задач
 
@@ -471,7 +463,7 @@ def show_task(lesson_id, task_id):
     db_sess = db_session.create_session()
     task = db_sess.query(Task).filter(Task.id == task_id).first()  # получение урока из дб
     if task:  # если урок найден
-        if not table_now:  # если пользователь зашёл на задачу, но не зарегистрирован => переводим на регистрацию
+        if not current_user.is_authenticated:  # если пользователь зашёл на задачу, но не зарегистрирован => переводим на регистрацию
             return redirect('/register_student')
 
         task_form = TaskForm()
@@ -485,7 +477,7 @@ def show_task(lesson_id, task_id):
         old_solution = db_sess.query(Solution).filter(current_user.id == Solution.student_id,
                                                       Solution.task_id == task.id).first()  # ищем старое решение
 
-        if task_form.submit.data and table_now == Student:  # если отправил код ученик
+        if task_form.submit.data and current_user.__class__ == Student:  # если отправил код ученик
             def add_new_solution():
                 '''Функция добавления нового решения'''
                 solution = Solution(
@@ -524,7 +516,7 @@ def show_task(lesson_id, task_id):
                 is_solved = False
         else:  # если ещё не отправляли
             is_send = False
-        if table_now in [Teacher, Admin]:
+        if current_user.__class__ in [Teacher, Admin]:
             is_send = False
         try:
             return render_template(f'task.html', form=task_form, task=task, examples=examples,
@@ -601,7 +593,7 @@ def delete_task(lesson_id, task_id):
 @app.route('/check_solutions')
 def show_solutions():
     '''Функция отображения решений учеников'''
-    if table_now == Teacher:
+    if current_user.__class__ == Teacher:
         db_sess = db_session.create_session()
         solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
         lst = []
@@ -645,14 +637,6 @@ def about_us():
     return render_template('about_us.html')
 
 
-@login_manager.user_loader
-def load_user(id):
-    '''Функция авторизации пользователя в сессии'''
-    db_sess = db_session.create_session()
-    if table_now:
-        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
-
-
 class Page:
     def __init__(self, link, name=None, enabled=True):
         self.name = name
@@ -693,7 +677,7 @@ def rating():
 
 @app.route('/profile')
 def profile():
-    is_teacher = table_now == Teacher
+    is_teacher = current_user.__class__ == Teacher
     if is_teacher:  # если авторизован учитель => получаем id его учеников и находим их
         db_sess = db_session.create_session()
         students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split()))
@@ -713,7 +697,7 @@ def load_image():
             ext = file.filename.rsplit('.', 1)[1].lower()
             filename = f'{str(uuid.uuid4())}.{ext}'
             with db_session.create_session() as dbs:
-                user = dbs.query(table_now).filter(current_user.id == table_now.id).first()
+                user = dbs.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
                 user.image_name = filename
                 dbs.commit()
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
@@ -766,7 +750,7 @@ def change_password():
             return render_template('change_password.html', form=form,
                                    message="Новый и Текущий пароль совпадают")  # отображение ошибки
         with db_session.create_session() as dbs:
-            user = dbs.query(current_user.__class__).filter(current_user.id == table_now.id).first()
+            user = dbs.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
             user.set_password(form.new_password.data)
             dbs.commit()
         return redirect('/profile')  # перевод на профиль
@@ -796,12 +780,24 @@ def remove_unused_uploaded_files():
         os.remove(file_path)
 
 
+USER_CLASSES = {
+    USER_ADMIN: Admin,
+    USER_STUDENT: Student,
+    USER_TEACHER: Teacher
+}
+
+
 @login_manager.user_loader
 def load_user(id):
     '''Функция авторизации пользователя в сессии'''
-    db_sess = db_session.create_session()
-    if table_now:
-        return Session.get(entity=table_now, ident=id, self=db_sess)  # создание сессии
+    s = id.split("|")
+    if len(s) != 2:
+        return None
+    id, cl = s
+    if cl not in USER_CLASSES:
+        return None
+    with db_session.create_session() as db_sess:
+        return Session.get(entity=USER_CLASSES[cl], ident=id, self=db_sess)  # создание сессии
 
 
 @app.route('/logout')

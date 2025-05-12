@@ -6,7 +6,7 @@ from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Lesson(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Lesson(SqlAlchemyBase, SerializerMixin):
     '''SQL база данных уроков'''
     __tablename__ = 'lessons'
 
