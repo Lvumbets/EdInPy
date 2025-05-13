@@ -644,6 +644,18 @@ def show_solution(solution_id):
                                form=form)
 
 
+@app.route('/codes')
+@login_required
+def show_codes():
+    if current_user.__class__ != Admin:
+        return redirect('/')
+
+    teachers_codes = config.teachers_access_tokens
+    admins_codes = config.admins_access_tokens
+
+    return render_template('codes.html', teachers=teachers_codes, admins=admins_codes)
+
+
 class Page:
     def __init__(self, link, name=None, enabled=True):
         self.name = name
@@ -691,8 +703,9 @@ def profile():
             students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split()))
             lst = [db_sess.query(Student).filter(Student.id == student.id).first() for student in students]
             return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=lst)
-
-    return render_template('profile.html', user=current_user, is_teacher=is_teacher)
+    is_admin = current_user.__class__ == Admin
+    if is_admin:
+        return render_template('profile.html', user=current_user, is_admin=is_admin)
 
 
 @app.route('/about_us')
@@ -711,7 +724,8 @@ def load_image():
             ext = file.filename.rsplit('.', 1)[1].lower()
             filename = f'{str(uuid.uuid4())}.{ext}'
             with db_session.create_session() as db_sess:
-                user = db_sess.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
+                user = db_sess.query(current_user.__class__).filter(
+                    current_user.id == current_user.__class__.id).first()
                 user.image_name = filename
                 db_sess.commit()
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))

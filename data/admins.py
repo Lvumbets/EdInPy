@@ -9,7 +9,7 @@ from .users import USER_ADMIN
 
 class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
     """SQL база данных для админов"""
-    __tablename__ = 'admins"
+    __tablename__ = "admins"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
 
