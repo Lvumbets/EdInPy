@@ -2,7 +2,7 @@ import datetime
 import os
 import uuid
 
-from flask import Flask, render_template, redirect, make_response, jsonify, abort, request
+from flask import Flask, render_template, redirect, make_response, jsonify, abort, request, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import Api
 from sqlalchemy.orm import Session
@@ -55,12 +55,14 @@ def register_student():
 
     if form.validate_on_submit():  # если нажали кнопку для сохранения регистрации
         if form.password.data != form.password_again.data:  # проверка на совпадение паролей
-            return render_template('register_student.html', form=form, message="Пароли не совпадают")
+            flash("Пароли не совпадают")
+            return render_template('register_student.html', form=form)
 
         with db_session.create_session() as db_sess:
             if db_sess.query(Student).filter(
                     Student.email == form.email.data).first():  # существует ли уже такой ученик
-                return render_template('register_student.html', form=form, message="Такой ученик уже есть")
+                flash("Такой ученик уже есть")
+                return render_template('register_student.html', form=form)
 
             # создание нового ученика
             student = Student(
@@ -86,8 +88,8 @@ def login_student():
             if student and student.check_password(form.password.data):  # если логин и пароль совпадают
                 login_user(student, remember=form.remember_me.data)  # авторизация ученика
                 return redirect("/lessons")  # перейти в список уроков
-        return render_template('login_student.html', form=form,
-                               message="Неправильный логин или пароль")  # если логин или пароль не те
+        flash("Неправильный логин или пароль")
+        return render_template('login_student.html', form=form)  # если логин или пароль не те
     return render_template('login_student.html', form=form)  # отображение страницы логина
 
 
@@ -97,17 +99,17 @@ def register_teacher():
     form = RegisterTeacher()  # форма регистрации учителя
     if form.validate_on_submit():  # если нажата кнопка регистрации
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
-            return render_template('register_teacher.html', form=form,
-                                   message="Пароли не совпадают")  # отображение ошибки
+            flash("Пароли не совпадают")
+            return render_template('register_teacher.html', form=form)  # отображение ошибки
         if form.access_code.data not in config.teachers_access_tokens:
             config.update_teachers_passwords()
-            return render_template('register_teacher.html', form=form,
-                                   message="Неверный код учителя")  # отображение ошибки
+            flash("Неверный код учителя")
+            return render_template('register_teacher.html', form=form)  # отображение ошибки
         config.update_teachers_passwords()
         with db_session.create_session() as db_sess:
             if db_sess.query(Teacher).filter(Teacher.email == form.email.data).first():  # если такой учитель уже есть
-                return render_template('register_teacher.html', form=form,
-                                       message="Такой учитель уже есть")  # отображение ошибки
+                flash("Такой учитель уже есть")
+                return render_template('register_teacher.html', form=form)  # отображение ошибки
             # создание учителя для дб
             teacher = Teacher(
                 name=form.name.data,
@@ -127,7 +129,8 @@ def register_teacher():
                         if student:
                             student.teacher_id = teacher.id
             except Exception:
-                return render_template('register_teacher.html', form=form, message='Данные об учениках введены неверно')
+                flash("Данные об учениках введены неверно")
+                return render_template('register_teacher.html', form=form)
 
             db_sess.commit()  # сохранение изменений в бд
         return redirect('/login_teacher')  # перевод на авторизацию учителя
@@ -144,8 +147,8 @@ def login_teacher():
             if teacher and teacher.check_password(form.password.data):  # если учитель найден - логинимся
                 login_user(teacher, remember=form.remember_me.data)  # логин учителя
                 return redirect("/lessons")  # переходим на страницу уроков
-        return render_template('login_teacher.html', form=form,
-                               message="Неправильный логин или пароль")  # отображение ошибки
+        flash("Неправильный логин или пароль")
+        return render_template('login_teacher.html', form=form,)  # отображение ошибки
     return render_template('login_teacher.html', form=form)  # отображение страницы логина учителя
 
 
@@ -155,17 +158,17 @@ def register_admin():
     form = RegisterAdmin()  # форма регистрации админа
     if form.validate_on_submit():  # если нажата кнопка регистрации
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
-            return render_template('register_admin.html', form=form,
-                                   message="Пароли не совпадают")  # отображение ошибки
+            flash("Пароли не совпадают")
+            return render_template('register_admin.html', form=form,)  # отображение ошибки
         if form.access_code.data not in config.admins_access_tokens:
             config.update_admins_passwords()
-            return render_template('register_admin.html', form=form,
-                                   message="Неверный код администратора")  # отображение ошибки
+            flash("Неверный код администратора")
+            return render_template('register_admin.html', form=form,)  # отображение ошибки
         config.update_admins_passwords()
-        with db_session.create_session as db_sess:
+        with db_session.create_session() as db_sess:
             if db_sess.query(Admin).filter(Admin.email == form.email.data).first():  # если такой админ уже есть
-                return render_template('register_admin.html', form=form,
-                                       message="Такой администратор уже есть")  # отображение ошибки
+                flash("Такой администратор уже есть")
+                return render_template('register_admin.html', form=form)  # отображение ошибки
             # создание админа для дб
             admin = Admin(
                 name=form.name.data,
@@ -191,9 +194,8 @@ def login_admin():
             if admin and admin.check_password(form.password.data):  # если админ найден - логинимся
                 login_user(admin, remember=form.remember_me.data)  # логин админа в сессии
                 return redirect("/lessons")  # переходим на страницу уроков
-
-            return render_template('login_admin.html', form=form,
-                                   message="Неправильный логин или пароль")  # отображение ошибки
+            flash("Неверный логин или пароль")
+            return render_template('login_admin.html', form=form)  # отображение ошибки
     return render_template('login_admin.html', form=form)  # отображении страницы логина админа
 
 
