@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 
 
 class RegisterTeacher(FlaskForm):
-    '''WTF форма для регистрации учителей'''
+    """WTF форма для регистрации учителей"""
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     age = StringField('Возраст', validators=[DataRequired()])
@@ -22,7 +22,7 @@ class RegisterTeacher(FlaskForm):
 
 
 class LoginTeacher(FlaskForm):
-    '''WTF форма для авторизации учителя'''
+    """WTF форма для авторизации учителя"""
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
@@ -30,6 +30,6 @@ class LoginTeacher(FlaskForm):
 
 
 class ChangeStudents(FlaskForm):
-    '''WTF форма для изменения учеников учителя'''
+    """WTF форма для изменения учеников учителя"""
     students = StringField('Ученики (напишите их id через пробел)')
     submit = SubmitField('Сохранить')

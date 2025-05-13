@@ -7,7 +7,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Task(SqlAlchemyBase, SerializerMixin):
-    '''SQL база данных задач'''
+    """SQL база данных задач"""
     __tablename__ = 'tasks'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

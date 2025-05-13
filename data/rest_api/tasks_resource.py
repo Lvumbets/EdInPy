@@ -7,17 +7,17 @@ from data.tasks import Task
 
 
 class TaskResource(Resource):
-    '''Класс ресурсов для работы с конкретной задачей'''
+    """Класс ресурсов для работы с конкретной задачей"""
 
     def get(self, task_id):
-        '''Ресурс получения задачи по id'''
+        """Ресурс получения задачи по id"""
         abort_if_task_not_found(task_id)
         db_sess = db_session.create_session()
         task = db_sess.query(Task).get(task_id)
         return jsonify({'task': task.to_dict(only=('id', 'title', 'condition', 'examples', 'less_id'))})
 
     def delete(self, task_id):
-        '''Функция ресурса удаления задачи по id'''
+        """Функция ресурса удаления задачи по id"""
         abort_if_task_not_found(task_id)
         db_sess = db_session.create_session()
         task = db_sess.query(Task).get(task_id)
@@ -27,17 +27,17 @@ class TaskResource(Resource):
 
 
 class TaskListResource(Resource):
-    '''Класс ресурсов для работы со всеми задачами'''
+    """Класс ресурсов для работы со всеми задачами"""
 
     def get(self):
-        '''Функция ресурса получения всех задач'''
+        """Функция ресурса получения всех задач"""
         db_sess = db_session.create_session()
         tasks = db_sess.query(Task).all()
         return jsonify(
             {'task': [task.to_dict(only=('id', 'title', 'condition', 'examples', 'less_id')) for task in tasks]})
 
     def post(self):
-        '''Функция ресурса для добавления новой задачи в список задач'''
+        """Функция ресурса для добавления новой задачи в список задач"""
         args = task_parser.parse_args()
         db_sess = db_session.create_session()
         task = Task(
@@ -52,7 +52,7 @@ class TaskListResource(Resource):
 
 
 def abort_if_task_not_found(task_id):
-    '''Функция общей работы для "аборта" сайта'''
+    """Функция общей работы для "аборта" сайта"""
     session = db_session.create_session()
     task = session.query(Task).get(task_id)
     if not task:

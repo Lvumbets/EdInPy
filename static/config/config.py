@@ -6,14 +6,14 @@ admins_access_tokens = []
 
 
 def generate_password(start, end):
-    '''Функция генератора кода'''
+    """Функция генератора кода"""
     characters = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(characters) for _ in range(random.randint(start, end)))
     return password
 
 
 def update_teachers_passwords():
-    '''Функция создания 10 кодов для учителей'''
+    """Функция создания 10 кодов для учителей"""
     teachers_access_tokens.clear()
     for _ in range(10):
         teachers_access_tokens.append(generate_password(5, 10))
@@ -21,7 +21,7 @@ def update_teachers_passwords():
 
 
 def update_admins_passwords():
-    '''Функция создания 10 кодов для администраторов'''
+    """Функция создания 10 кодов для администраторов"""
     admins_access_tokens.clear()
     for _ in range(10):
         admins_access_tokens.append(generate_password(10, 20))

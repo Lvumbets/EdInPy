@@ -7,17 +7,17 @@ from data.lessons import Lesson
 
 
 class LessonResource(Resource):
-    '''Класс ресурсов для работы с конкретным уроком'''
+    """Класс ресурсов для работы с конкретным уроком"""
 
     def get(self, lesson_id):
-        '''Ресурс получения урока по id'''
+        """Ресурс получения урока по id"""
         abort_if_lesson_not_found(lesson_id)
         db_sess = db_session.create_session()
         lesson = db_sess.query(Lesson).get(lesson_id)
         return jsonify({'lesson': lesson.to_dict(only=('id', 'title', 'description'))})
 
     def delete(self, lesson_id):
-        '''Функция ресурса удаления урока по id'''
+        """Функция ресурса удаления урока по id"""
         abort_if_lesson_not_found(lesson_id)
         db_sess = db_session.create_session()
         lesson = db_sess.query(Lesson).get(lesson_id)
@@ -27,7 +27,7 @@ class LessonResource(Resource):
 
 
 def abort_if_lesson_not_found(lesson_id):
-    '''Функция общей работы для "аборта" сайта'''
+    """Функция общей работы для "аборта" сайта"""
     session = db_session.create_session()
     lesson = session.query(Lesson).get(lesson_id)
     if not lesson:
@@ -35,16 +35,16 @@ def abort_if_lesson_not_found(lesson_id):
 
 
 class LessonsListResource(Resource):
-    '''Класс ресурсов для работы со всеми уроками'''
+    """Класс ресурсов для работы со всеми уроками"""
 
     def get(self):
-        '''Функция ресурса получения всех уроков'''
+        """Функция ресурса получения всех уроков"""
         db_sess = db_session.create_session()
         lessons = db_sess.query(Lesson).all()
         return jsonify({'lessons': [lesson.to_dict(only=('id', 'title', 'description')) for lesson in lessons]})
 
     def post(self):
-        '''Функция ресурса для добавления нового урока в список уроков'''
+        """Функция ресурса для добавления нового урока в список уроков"""
         args = lesson_parser.parse_args()
         db_sess = db_session.create_session()
         lesson = Lesson(

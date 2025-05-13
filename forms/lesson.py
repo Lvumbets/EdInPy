@@ -3,7 +3,7 @@ from wtforms import StringField, SubmitField
 
 
 class LessonAdd(FlaskForm):
-    '''WTF форма для добавления нового урока'''
+    """WTF форма для добавления нового урока"""
     title = StringField('Название')
     description = StringField('Описание')
 
@@ -11,7 +11,7 @@ class LessonAdd(FlaskForm):
 
 
 class LessonEdit(FlaskForm):
-    '''WTF форма для редактирования урока'''
+    """WTF форма для редактирования урока"""
     title = StringField('Название')
     description = StringField('Описание')
 

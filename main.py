@@ -30,7 +30,7 @@ from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
 from forms.teacher import RegisterTeacher, LoginTeacher, ChangeStudents
 from static.config import config
 
-'''Создание ключевых значений и переменных для Flask'''
+"""Создание ключевых значений и переменных для Flask"""
 app = Flask(__name__)
 api = Api(app)
 login_manager = LoginManager()
@@ -44,13 +44,13 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 @app.route('/')
 def index():
-    '''Функция отображения стартовой страницы'''
+    """Функция отображения стартовой страницы"""
     return render_template('main_page.html')
 
 
 @app.route('/register_student', methods=['GET', 'POST'])
 def register_student():
-    '''Функция регистрации ученика'''
+    """Функция регистрации ученика"""
     form = RegisterStudent()  # форма регистрации
 
     if form.validate_on_submit():  # если нажали кнопку для сохранения регистрации
@@ -78,7 +78,7 @@ def register_student():
 
 @app.route('/login_student', methods=['GET', 'POST'])
 def login_student():
-    '''Функция логина ученика'''
+    """Функция логина ученика"""
     form = LoginStudent()  # форма логина ученика
     if form.validate_on_submit():  # если нажали на кнопку авторизации
         with db_session.create_session() as db_sess:
@@ -93,7 +93,7 @@ def login_student():
 
 @app.route('/register_teacher', methods=['GET', 'POST'])
 def register_teacher():
-    '''Функция регистрации учителя'''
+    """Функция регистрации учителя"""
     form = RegisterTeacher()  # форма регистрации учителя
     if form.validate_on_submit():  # если нажата кнопка регистрации
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
@@ -119,7 +119,7 @@ def register_teacher():
             teacher.set_password(form.password.data)  # установка пароля для учителя
             db_sess.add(teacher)  # добавление учителя в бд
 
-            '''Добавление id учителя к карточкам выбранных учеников'''
+            """Добавление id учителя к карточкам выбранных учеников"""
             try:
                 if len(form.students.data.split()):
                     for id in form.students.data.split():
@@ -136,7 +136,7 @@ def register_teacher():
 
 @app.route('/login_teacher', methods=['GET', 'POST'])
 def login_teacher():
-    '''Функция логина учителя'''
+    """Функция логина учителя"""
     form = LoginTeacher()  # форма логина учителя
     if form.validate_on_submit():  # при нажатии на кнопку
         with db_session.create_session() as db_sess:
@@ -151,7 +151,7 @@ def login_teacher():
 
 @app.route('/register_admin', methods=['GET', 'POST'])
 def register_admin():
-    '''Функция регистрации админа'''
+    """Функция регистрации админа"""
     form = RegisterAdmin()  # форма регистрации админа
     if form.validate_on_submit():  # если нажата кнопка регистрации
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
@@ -162,7 +162,7 @@ def register_admin():
             return render_template('register_admin.html', form=form,
                                    message="Неверный код администратора")  # отображение ошибки
         config.update_admins_passwords()
-        with db_session.create_session as db_sess:
+        with db_session.create_session() as db_sess:
             if db_sess.query(Admin).filter(Admin.email == form.email.data).first():  # если такой админ уже есть
                 return render_template('register_admin.html', form=form,
                                        message="Такой администратор уже есть")  # отображение ошибки
@@ -183,7 +183,7 @@ def register_admin():
 
 @app.route('/login_admin', methods=['GET', 'POST'])
 def login_admin():
-    '''Функция логина администратора'''
+    """Функция логина администратора"""
     form = LoginAdmin()  # форма логина админа
     if form.validate_on_submit():  # при нажатии на кнопку
         with db_session.create_session() as db_sess:
@@ -199,7 +199,7 @@ def login_admin():
 
 @app.route('/lessons')
 def lessons():
-    '''Функция отображения уроков'''
+    """Функция отображения уроков"""
     with db_session.create_session() as db_sess:
         less = db_sess.query(Lesson).all()  # получение всех уроков
         is_admin = current_user.__class__ == Admin
@@ -208,7 +208,7 @@ def lessons():
 
 @app.route("/lessons/<int:lesson_id>/tasks")
 def show_lesson(lesson_id):
-    '''Функция отображения урока и его задача'''
+    """Функция отображения урока и его задача"""
     with db_session.create_session() as db_sess:
         lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
         tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
@@ -219,7 +219,7 @@ def show_lesson(lesson_id):
 
 @app.route('/lessons/add', methods=['GET', 'POST'])
 def add_lesson():
-    '''Функция страницы добавления нового урока'''
+    """Функция страницы добавления нового урока"""
     if current_user.__class__ != Admin:
         return redirect('/lessons')
 
@@ -239,7 +239,7 @@ def add_lesson():
 
 @app.route('/lessons/edit/<int:lesson_id>', methods=['GET', 'POST'])
 def edit_lesson(lesson_id):
-    '''Функция страницы редактирования урока'''
+    """Функция страницы редактирования урока"""
     if current_user.__class__ != Admin:
         return redirect('/lessons')
 
@@ -262,7 +262,7 @@ def edit_lesson(lesson_id):
 
 @app.route('/lessons/delete/<int:lesson_id>')
 def delete_lesson(lesson_id):
-    '''Функция удаления урока'''
+    """Функция удаления урока"""
     if current_user.__class__ != Admin:
         return redirect('/lessons')
 
@@ -313,7 +313,7 @@ def add_lesson_book(lesson_id):
 @app.route('/books/edit/<int:book_id>', methods=['GET', 'POST'])
 @login_required
 def edit_lesson_book(book_id):
-    '''Функция страницы редактирования учебника'''
+    """Функция страницы редактирования учебника"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons')
 
@@ -381,7 +381,7 @@ def add_book_paragraph(book_id):
 @app.route('/book_paragraphs/edit/<int:paragraph_id>', methods=['GET', 'POST'])
 @login_required
 def edit_book_paragraph(paragraph_id):
-    '''Функция страницы редактирования раздела учебника'''
+    """Функция страницы редактирования раздела учебника"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons')
 
@@ -432,7 +432,7 @@ def add_book_paragraph_image(book_id):
 @app.route('/book_paragraphs/edit_image/<int:paragraph_id>', methods=['GET', 'POST'])
 @login_required
 def edit_book_paragraph_image(paragraph_id):
-    '''Функция страницы редактирования раздела учебника'''
+    """Функция страницы редактирования раздела учебника"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons')
 
@@ -472,7 +472,7 @@ def delete_book_paragraph(paragraph_id):
 
 @app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])
 def show_task(lesson_id, task_id):
-    '''Функция отображения выбранного урока'''
+    """Функция отображения выбранного урока"""
     with db_session.create_session() as db_sess:
         task = db_sess.query(Task).filter(Task.id == task_id).first()  # получение урока из дб
         if task:  # если урок найден
@@ -492,7 +492,7 @@ def show_task(lesson_id, task_id):
 
             if task_form.submit.data and current_user.__class__ == Student:  # если отправил код ученик
                 def add_new_solution():
-                    '''Функция добавления нового решения'''
+                    """Функция добавления нового решения"""
                     solution = Solution(
                         answer=task_form.code.data,
                         student_id=db_sess.query(Student).filter(current_user.id == Student.id).first().id,
@@ -542,7 +542,7 @@ def show_task(lesson_id, task_id):
 
 @app.route('/lessons/<int:lesson_id>/tasks/add', methods=['GET', 'POST'])
 def add_task(lesson_id):
-    '''Функция страницы добавления новой задачи'''
+    """Функция страницы добавления новой задачи"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons/{lesson_id}/tasks')
 
@@ -563,7 +563,7 @@ def add_task(lesson_id):
 
 @app.route('/lessons/<int:lesson_id>/tasks/edit/<int:task_id>', methods=['GET', 'POST'])
 def edit_task(lesson_id, task_id):
-    '''Функция страницы редактирования урока'''
+    """Функция страницы редактирования урока"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons/{lesson_id}/tasks')
 
@@ -592,7 +592,7 @@ def edit_task(lesson_id, task_id):
 
 @app.route('/lessons/<int:lesson_id>/tasks/delete/<int:task_id>')
 def delete_task(lesson_id, task_id):
-    '''Функция удаления задачи'''
+    """Функция удаления задачи"""
     if current_user.__class__ != Admin:
         return redirect(f'/lessons/{lesson_id}/tasks')
 
@@ -605,7 +605,7 @@ def delete_task(lesson_id, task_id):
 
 @app.route('/check_solutions')
 def show_solutions():
-    '''Функция отображения решений учеников'''
+    """Функция отображения решений учеников"""
     if current_user.__class__ == Teacher:
         with db_session.create_session() as db_sess:
             solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
@@ -653,7 +653,7 @@ class Page:
 
 @app.route('/rating')
 def rating():
-    '''Функция страницы рейтинга'''
+    """Функция страницы рейтинга"""
     page_arg = request.args.get('page')
     if not page_arg:
         page_arg = 0
@@ -697,14 +697,14 @@ def profile():
 
 @app.route('/about_us')
 def about_us():
-    '''Функция для отображения страницы "о нас"'''
+    """Функция для отображения страницы 'о нас'"""
     return render_template('about_us.html')
 
 
 @app.route('/load_image', methods=['POST', 'GET'])
 @login_required
 def load_image():
-    '''Функция загрузки изображений'''
+    """Функция загрузки изображений"""
     if request.method == 'POST':
         file = request.files['file']
         if file.filename:
@@ -721,7 +721,7 @@ def load_image():
 
 @app.route('/change_students', methods=['POST', 'GET'])
 def change_students():
-    '''Функция изменения учеников учителя'''
+    """Функция изменения учеников учителя"""
     if current_user.__class__ != Teacher:
         return redirect('/')
 
@@ -752,7 +752,7 @@ def change_students():
 @app.route('/change_password', methods=['POST', 'GET'])
 @login_required
 def change_password():
-    '''Функция изменения пароля'''
+    """Функция изменения пароля"""
     form = Change_Password()  # форма изменения пароля
     if form.validate_on_submit():  # если нажата кнопка изменения
         if form.new_password.data != form.new_password_again.data:  # если введённые пароли не совпадают
@@ -804,7 +804,7 @@ USER_CLASSES = {
 
 @login_manager.user_loader
 def load_user(id):
-    '''Функция авторизации пользователя в сессии'''
+    """Функция авторизации пользователя в сессии"""
     s = id.split("|")
     if len(s) != 2:
         return None
@@ -818,25 +818,25 @@ def load_user(id):
 @app.route('/logout')
 @login_required
 def logout():
-    '''Функция деавторизации пользователя'''
+    """Функция деавторизации пользователя"""
     logout_user()
     return redirect("/")
 
 
 @app.errorhandler(404)
 def not_found(error):
-    '''Функция выброса ошибки о ненайденной странице'''
+    """Функция выброса ошибки о ненайденной странице"""
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 @app.errorhandler(400)
 def bad_request(_):
-    '''Функция выброса ошибки о неправильном request запросе'''
+    """Функция выброса ошибки о неправильном request запросе"""
     return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
 def main():
-    '''Функция запуска сайта'''
+    """Функция запуска сайта"""
     api.add_resource(lessons_resource.LessonsListResource, '/api/lessons')  # api для списка уроков
     api.add_resource(lessons_resource.LessonResource, '/api/lessons/<int:lesson_id>')  # api для конкретного урока
 
@@ -854,5 +854,5 @@ def main():
 
 
 if __name__ == '__main__':
-    '''Если был запущен этот файл'''
+    """Если был запущен этот файл"""
     main()

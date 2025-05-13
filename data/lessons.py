@@ -7,7 +7,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Lesson(SqlAlchemyBase, SerializerMixin):
-    '''SQL база данных уроков'''
+    """SQL база данных уроков"""
     __tablename__ = 'lessons'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

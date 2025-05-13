@@ -9,7 +9,7 @@ from .users import USER_TEACHER
 
 
 class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
-    '''SQL база данных для учителей'''
+    """SQL база данных для учителей"""
     __tablename__ = 'teachers'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

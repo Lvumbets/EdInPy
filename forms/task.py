@@ -5,13 +5,13 @@ from wtforms.widgets.core import TextArea
 
 
 class TaskForm(FlaskForm):
-    '''WTF форма для отправки решений задач'''
+    """WTF форма для отправки решений задач"""
     code = StringField('Code', widget=TextArea())
     submit = SubmitField('Отправить')
 
 
 class TaskAdd(FlaskForm):
-    '''WTF форма для добавления новой задачи'''
+    """WTF форма для добавления новой задачи"""
     title = StringField('Название')
     condition = StringField('Описание')
     examples = StringField('Примеры')
@@ -20,7 +20,7 @@ class TaskAdd(FlaskForm):
 
 
 class TaskEdit(FlaskForm):
-    '''WTF форма для изменения задачи'''
+    """WTF форма для изменения задачи"""
     title = StringField('Название')
     condition = StringField('Описание')
     examples = StringField('Примеры')
