@@ -1,8 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <style>
+<style>
         h1.t {
         width: 7em;
         height: 3em;
@@ -26,9 +23,7 @@
             bottom:5px;
             right:5px;
         }
-    </style>
-</head>
-<body>
+</style>
 <h1 style="margin-left: 0%">Профиль</h1>
 <div class="card d" style="width: 18rem;">
     {% if current_user.image_name %}
@@ -45,11 +40,9 @@
         <p class="card-text"><b>Ваши ученики:</b> {{ lst|join(", ") }}</p>
         <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Ваши ученики</a>
         {% endif %}
-        <a type="button" class="btn btn-success" href="/load_image">Загрузить изображение</a>
+        <a type="button" class="btn btn-success" href="/profile/edit">Изменить профиль</a>
     </div>
 </div>
 <a type="button" class="btn btn-info rb" href="/change_password">Сменить пароль</a>
 <a type="button" class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
-</body>
-</html>
 {% endblock %}
