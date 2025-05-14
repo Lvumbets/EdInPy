@@ -15,8 +15,10 @@ from data.lesson_books import LessonBook
 from data.lessons import Lesson
 from data.rest_api import lessons_resource, tasks_resource
 from data.solutions import Solution
+from data.student_notifications import StudentNotification
 from data.students import Student
 from data.tasks import Task
+from data.teacher_notifications import TeacherNotification
 from data.teachers import Teacher
 from data.users import USER_ADMIN, USER_STUDENT, USER_TEACHER
 from forms.admin import LoginAdmin, RegisterAdmin
@@ -25,6 +27,7 @@ from forms.lesson import LessonEdit, LessonAdd
 from forms.lesson_book import LessonBookAdd, LessonBookEdit
 from forms.lesson_book_paragraph import LessonBookParagraphAdd, LessonBookParagraphEdit, LessonBookImageAdd, \
     LessonBookImageEdit
+from forms.notification import NotificationRead, NotificationReadAll
 from forms.profile import ProfileImageAdd
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
@@ -35,6 +38,7 @@ from static.config import config
 app = Flask(__name__)
 api = Api(app)
 login_manager = LoginManager()
+login_manager.login_view = '/login_student'
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'EDINPY_PROJECT'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
@@ -214,7 +218,7 @@ def show_lesson(lesson_id):
     '''Функция отображения урока и его задача'''
     with db_session.create_session() as db_sess:
         lesson = db_sess.query(Lesson).filter(Lesson.id == lesson_id).first()  # получение урока
-        tasks = db_sess.query(Task).filter(Task.less_id == lesson_id)  # получение задач
+        tasks = db_sess.query(Task).filter(Task.less_id == lesson_id).all()  # получение задач
         is_admin = current_user.__class__ == Admin
         return render_template(f'lesson.html', lesson=lesson, tasks=tasks,
                                is_admin=is_admin)  # отображение урока и его задач
@@ -611,7 +615,7 @@ def show_solutions():
     '''Функция отображения решений учеников'''
     if current_user.__class__ == Teacher:
         with db_session.create_session() as db_sess:
-            solutions = db_sess.query(Solution).filter(Solution.is_checked == False)
+            solutions = db_sess.query(Solution).filter(Solution.is_checked == False).all()
             lst = []
             for solution in solutions:
                 student = db_sess.query(Student).filter(Student.id == solution.student_id).first()
@@ -656,19 +660,22 @@ class Page:
 
 @app.route('/rating')
 def rating():
-    '''Функция страницы рейтинга'''
+    """Функция страницы рейтинга"""
     page_arg = request.args.get('page')
     if not page_arg:
         page_arg = 0
     else:
         page_arg = int(page_arg) - 1
+    if page_arg < 0:
+        page_arg = 0
     page_limit = 20
     with db_session.create_session() as db_sess:
         cnt = db_sess.query(Student).count()
-        if page_arg * page_limit >= cnt:
-            return redirect('rating')
-        users = db_sess.query(Student).order_by(Student.completed_tasks.desc(), Student.surname.asc(),
-                                                Student.name.asc()).limit(page_limit).offset(page_arg * page_limit)
+        if page_arg * page_limit >= cnt and cnt:
+            return redirect('/rating')
+        users = db_sess.query(Student) \
+            .order_by(Student.completed_tasks.desc(), Student.surname.asc(), Student.name.asc()).limit(page_limit) \
+            .offset(page_arg * page_limit).all()
         pages = []
         for i in range(page_arg - 2, page_arg + 3):
             if i >= 0 and i * page_limit < cnt:
@@ -685,29 +692,126 @@ def rating():
         return render_template('rating.html', users=users, pages=pages, prev_page=prev_page, next_page=next_page)
 
 
+@app.route('/notifications')
+@login_required
+def notifications():
+    """Функция страницы уведомлений"""
+    if current_user.__class__ == Teacher:
+        table = TeacherNotification
+        table_id = TeacherNotification.teacher_id
+    elif current_user.__class__ == Student:
+        table = StudentNotification
+        table_id = StudentNotification.student_id
+    else:
+        return redirect("/")
+    page_arg = request.args.get('page')
+    if not page_arg:
+        page_arg = 0
+    else:
+        page_arg = int(page_arg) - 1
+    if page_arg < 0:
+        page_arg = 0
+    page_limit = 5
+    with db_session.create_session() as db_sess:
+        cnt = db_sess.query(table).filter(table_id == current_user.id).count()
+        if page_arg * page_limit >= cnt and cnt:
+            return redirect('/notifications')
+        notifications = db_sess.query(table).filter(table_id == current_user.id) \
+            .order_by(table.is_read.asc(), table.created_at.desc()) \
+            .limit(page_limit).offset(page_arg * page_limit).all()
+        pages = []
+        for i in range(page_arg - 2, page_arg + 3):
+            if i >= 0 and i * page_limit < cnt:
+                page = Page(f"/notifications?page={i + 1}", i + 1)
+                if i == page_arg:
+                    page.enabled = False
+                pages.append(page)
+        prev_page = Page(f"/notifications?page={page_arg}")
+        next_page = Page(f"/notifications?page={page_arg + 2}")
+        if page_arg - 1 < 0:
+            prev_page.enabled = False
+        if (page_arg + 1) * page_limit >= cnt:
+            next_page.enabled = False
+
+        return render_template('notifications.html', notifications=notifications, pages=pages,
+                               current_page=page_arg + 1,
+                               prev_page=prev_page, next_page=next_page, form_read=NotificationRead(),
+                               form_readall=NotificationReadAll())
+
+
+@app.route('/notifications/readall', methods=['POST'])
+@login_required
+def notifications_readall():
+    """Функция страницы пометить все уведомления как прочитанные"""
+    if current_user.__class__ == Teacher:
+        table = TeacherNotification
+        table_id = TeacherNotification.teacher_id
+    elif current_user.__class__ == Student:
+        table = StudentNotification
+        table_id = StudentNotification.student_id
+    else:
+        return redirect("/")
+    page_arg = request.args.get('page')
+    if not page_arg:
+        page_arg = 1
+    form = NotificationReadAll()
+    if form.validate_on_submit():
+        with db_session.create_session() as db_sess:
+            for i in db_sess.query(table).filter(table_id == current_user.id, table.is_read == False):
+                i.is_read = True
+            db_sess.commit()
+
+    return redirect(f'/notifications')
+
+
+@app.route('/notifications/<int:notification_id>/read', methods=['POST'])
+@login_required
+def notifications_read(notification_id):
+    """Функция страницы уведомлений"""
+    if current_user.__class__ == Teacher:
+        table = TeacherNotification
+        table_id = TeacherNotification.teacher_id
+    elif current_user.__class__ == Student:
+        table = StudentNotification
+        table_id = StudentNotification.student_id
+    else:
+        return redirect("/")
+    page_arg = request.args.get('page')
+    if not page_arg:
+        page_arg = 1
+    form = NotificationRead()
+    if form.validate_on_submit():
+        with db_session.create_session() as db_sess:
+            for i in db_sess.query(table).filter(table_id == current_user.id, table.id == notification_id,
+                                                 table.is_read == False):
+                i.is_read = True
+            db_sess.commit()
+
+    return redirect(f'/notifications?page={page_arg}')
+
+
 @app.route('/profile')
 @login_required
 def profile():
     is_teacher = current_user.__class__ == Teacher
     if is_teacher:  # если авторизован учитель => получаем id его учеников и находим их
         with db_session.create_session() as db_sess:
-            students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split()))
-            lst = [db_sess.query(Student).filter(Student.id == student.id).first() for student in students]
-            return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=lst)
+            students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split())).all()
+            return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=students)
 
     return render_template('profile.html', user=current_user, is_teacher=is_teacher)
 
 
 @app.route('/about_us')
 def about_us():
-    '''Функция для отображения страницы "о нас"'''
+    """Функция для отображения страницы "о нас\""""
     return render_template('about_us.html')
 
 
 @app.route('/profile/edit', methods=['POST', 'GET'])
 @login_required
 def profile_edit():
-    '''Функция загрузки изменения профиля'''
+    """Функция загрузки изменения профиля"""
     form = ProfileImageAdd()  # форма добавления изображения
     if form.validate_on_submit():  # если нажата кнопка submit
         ext = form.image.data.filename.rsplit('.', 1)[1].lower()
@@ -760,7 +864,7 @@ def change_students():
 @app.route('/change_password', methods=['POST', 'GET'])
 @login_required
 def change_password():
-    '''Функция изменения пароля'''
+    """Функция изменения пароля"""
     form = Change_Password()  # форма изменения пароля
     if form.validate_on_submit():  # если нажата кнопка изменения
         if form.new_password.data != form.new_password_again.data:  # если введённые пароли не совпадают
@@ -812,7 +916,7 @@ USER_CLASSES = {
 
 @login_manager.user_loader
 def load_user(id):
-    '''Функция авторизации пользователя в сессии'''
+    """Функция авторизации пользователя в сессии"""
     s = id.split("|")
     if len(s) != 2:
         return None

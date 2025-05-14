@@ -60,7 +60,17 @@
         <a href="/check_solutions" type="button" class="btn solutions">Проверка решений</a>
         <a href="/rating" type="button" class="btn rating">Рейтинг</a>
         {% if current_user.is_authenticated %}
-        <a class="navbar-brand p-1 bd-highlight" href="/profile"><h3><b>{{ current_user.name }} {{ current_user.surname }}</b></h3></a>
+        {% if current_user.get_type() in ["student", "teacher"] %}
+        {% if current_user.has_notifications() %}
+        <a href="/notifications"><img src="{{ url_for('static', filename='bell_black.png') }}" width=32px
+                                      height=32px></a>
+        {% else %}
+        <a href="/notifications"><img src="{{ url_for('static', filename='bell_white.png') }}" width=32px
+                                      height=32px></a>
+        {% endif %}
+        {% endif %}
+        <a class="navbar-brand p-1 bd-highlight" href="/profile"><h3><b>{{ current_user.name }} {{ current_user.surname
+            }}</b></h3></a>
         {% else %}
         <div class="dropdown p-1 bd-highlight">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
@@ -86,7 +96,7 @@
         </div>
         {% endif %}
     </nav>
-        {% for message in get_flashed_messages() %}
+    {% for message in get_flashed_messages() %}
     <div class="alert alert-danger text-center" role="alert">
         {{ message }}
     </div>
