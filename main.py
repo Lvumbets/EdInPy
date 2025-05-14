@@ -25,6 +25,7 @@ from forms.lesson import LessonEdit, LessonAdd
 from forms.lesson_book import LessonBookAdd, LessonBookEdit
 from forms.lesson_book_paragraph import LessonBookParagraphAdd, LessonBookParagraphEdit, LessonBookImageAdd, \
     LessonBookImageEdit
+from forms.profile import ProfileImageAdd
 from forms.student import RegisterStudent, LoginStudent
 from forms.task import TaskForm, CheckSolve, TaskAdd, TaskEdit
 from forms.teacher import RegisterTeacher, LoginTeacher, ChangeStudents
@@ -148,7 +149,7 @@ def login_teacher():
                 login_user(teacher, remember=form.remember_me.data)  # логин учителя
                 return redirect("/lessons")  # переходим на страницу уроков
         flash("Неправильный логин или пароль")
-        return render_template('login_teacher.html', form=form,)  # отображение ошибки
+        return render_template('login_teacher.html', form=form)  # отображение ошибки
     return render_template('login_teacher.html', form=form)  # отображение страницы логина учителя
 
 
@@ -159,11 +160,11 @@ def register_admin():
     if form.validate_on_submit():  # если нажата кнопка регистрации
         if form.password.data != form.password_again.data:  # если введённые пароли не совпадают
             flash("Пароли не совпадают")
-            return render_template('register_admin.html', form=form,)  # отображение ошибки
+            return render_template('register_admin.html', form=form)  # отображение ошибки
         if form.access_code.data not in config.admins_access_tokens:
             config.update_admins_passwords()
             flash("Неверный код администратора")
-            return render_template('register_admin.html', form=form,)  # отображение ошибки
+            return render_template('register_admin.html', form=form)  # отображение ошибки
         config.update_admins_passwords()
         with db_session.create_session() as db_sess:
             if db_sess.query(Admin).filter(Admin.email == form.email.data).first():  # если такой админ уже есть
@@ -716,23 +717,27 @@ def about_us():
     return render_template('about_us.html')
 
 
-@app.route('/load_image', methods=['POST', 'GET'])
+@app.route('/profile/edit', methods=['POST', 'GET'])
 @login_required
-def load_image():
-    """Функция загрузки изображений"""
-    if request.method == 'POST':
-        file = request.files['file']
-        if file.filename:
-            ext = file.filename.rsplit('.', 1)[1].lower()
-            filename = f'{str(uuid.uuid4())}.{ext}'
-            with db_session.create_session() as db_sess:
-                user = db_sess.query(current_user.__class__).filter(
-                    current_user.id == current_user.__class__.id).first()
-                user.image_name = filename
-                db_sess.commit()
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
-            return redirect('/profile')
-    return render_template('load_image.html')
+def profile_edit():
+    '''Функция загрузки изменения профиля'''
+    form = ProfileImageAdd()  # форма добавления изображения
+    if form.validate_on_submit():  # если нажата кнопка submit
+        ext = form.image.data.filename.rsplit('.', 1)[1].lower()
+        filename = f'{str(uuid.uuid4())}.{ext}'
+        with db_session.create_session() as db_sess:
+            user = db_sess.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
+            user.image_name = filename
+            user.name = form.name.data
+            user.surname = form.surname.data
+            user.age = form.age.data
+            db_sess.commit()
+            form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
+        return redirect(f'/profile')
+    form.name.data = current_user.name
+    form.surname.data = current_user.surname
+    form.age.data = current_user.age
+    return render_template('edit_profile.html', form=form)
 
 
 @app.route('/change_students', methods=['POST', 'GET'])
