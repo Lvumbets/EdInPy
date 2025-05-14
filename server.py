@@ -1009,7 +1009,7 @@ def main():
 
     remove_unused_uploaded_files()
 
-    app.run(port=8080, host='edinpy.netlify.app')
+    app.run()
 
 
 if __name__ == '__main__':
