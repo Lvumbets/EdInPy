@@ -1,0 +1,65 @@
+{% extends "base.html" %} {% block content %}
+{% if notifications %}
+<style>
+    hr {
+        height: 1px;
+    }
+</style>
+<h2 style="text-align: center;">Уведомления</h2>
+<div class="container w-50 text-center" style="background: rgb(230, 230, 230);">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <form action="/notifications/readall?page={{ current_page }}" method="post">
+            {{ form_readall.hidden_tag() }}
+            {{ form_readall.submit(type="submit", class="btn btn-light") }}
+        </form>
+    </div>
+    <br>
+    {% for notification in notifications %}
+    <div class="row">
+        <div class="col">
+            <div class="container w-90">
+                <h5>{{ notification.title }}</h5>{% if notification.is_read %}(Прочитано){% endif %}
+                <p class="text-start fs-6">{{ notification.content }}</p>
+                <p class="text-end fs-6">{{ notification.created_at.strftime("%H:%M:%S %d-%m-%Y") }}</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                {% if not notification.is_read %}
+                <form action="/notifications/{{ notification.id }}/read?page={{ current_page }}" method="post">
+                    {{ form_read.hidden_tag() }}
+                    {{ form_read.submit(type="submit", class="btn btn-light") }}
+                </form>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link {{ 'disabled' if not prev_page.enabled }}"
+                       href="{{ prev_page.link }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for page in pages %}
+                <li class="page-item {{ 'disabled' if not page.enabled }}">
+                    <a class="page-link" href="{{ page.link }}">{{page.name }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {{ 'disabled' if not next_page.enabled }}">
+                    <a class="page-link" href="{{ next_page.link }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% else %}
+<div class="container mx-auto">
+    <p class="fs-3 text-center">У Вас еще нет уведомлений</p>
+</div>
+{% endif %}
+{% endblock %}

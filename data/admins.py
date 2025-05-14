@@ -37,3 +37,6 @@ class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def get_id(self):
         return f"{self.id}|{USER_ADMIN}"
+
+    def get_type(self):
+        return USER_ADMIN
