@@ -45,6 +45,7 @@
             </table>
         </div>
         <br/>
+        {% if current_user.get_type() == "student" %}
         <div>{{ form.code(cols=100, rows=10) }}</div>
         {% if is_checked %}
         <p>Задача проверена</p>
@@ -60,7 +61,10 @@
         <p>Задача не отправлена</p>
         {% endif %}
         {% endif %}
+        {% if not is_solved %}
         <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+        {% endif %}
+        {% endif %}
     </div>
 </form>
 {% endblock %}

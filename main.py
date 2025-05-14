@@ -478,14 +478,15 @@ def delete_book_paragraph(paragraph_id):
 
 
 @app.route("/lessons/<int:lesson_id>/tasks/<int:task_id>", methods=['GET', 'POST'])
+@login_required
 def show_task(lesson_id, task_id):
     """Функция отображения выбранного урока"""
     with db_session.create_session() as db_sess:
         task = db_sess.query(Task).filter(Task.id == task_id).first()  # получение урока из дб
         if task:  # если урок найден
-            if not current_user.is_authenticated:  # если пользователь зашёл на задачу, но не зарегистрирован => переводим на регистрацию
-                return redirect('/register_student')
-
+            if current_user.__class__ == Student and not current_user.teacher_id:
+                flash("Для Вас еще не назначен учитель")
+                return redirect(f'/lessons/{lesson_id}/tasks')
             task_form = TaskForm()
             try:
                 examples = [example.split(':') for example in str(task.examples).split(';')]  # форматирование примеров
@@ -506,6 +507,14 @@ def show_task(lesson_id, task_id):
                         task_id=task.id
                     )
                     db_sess.add(solution)
+                    notification = TeacherNotification()
+                    notification.teacher_id = current_user.teacher_id
+                    notification.title = "Добавлено решение"
+                    notification.content = f"""
+Добавлено решение для задачи "{task.title}" в уроке "{task.lesson.title}"<br>
+<a href="/check_solutions/{solution.id}">Окрыть решение</a>
+"""
+                    db_sess.add(notification)
                     db_sess.commit()
 
                 # если есть старое решение и оно неправильное => заменить на новое
@@ -611,6 +620,7 @@ def delete_task(lesson_id, task_id):
 
 
 @app.route('/check_solutions')
+@login_required
 def show_solutions():
     """Функция отображения решений учеников"""
     if current_user.__class__ == Teacher:
@@ -626,6 +636,7 @@ def show_solutions():
 
 
 @app.route('/check_solutions/<int:solution_id>', methods=['GET', 'POST'])
+@login_required
 def show_solution(solution_id):
     if current_user.__class__ != Teacher:
         return redirect('/')
@@ -638,13 +649,26 @@ def show_solution(solution_id):
 
         form = CheckSolve()
         if form.submit.data:  # если нажата кнопка 'сохранить'
+            notification = StudentNotification()
+            notification.student_id = solution.student_id
             if form.is_solved.data:  # если задача решена
                 student.completed_tasks += 1  # к кол-ву решённых задач
                 solution.is_checked = True  # проверена
                 solution.is_solved = True  # решена
+                notification.title = "Решение проверено(зачтено)"
+                notification.content = f"""
+Решение зачтено для задачи "{task.title}" в уроке "{task.lesson.title}"<br>
+<a href="/lessons/{task.lesson.id}/tasks/{task.id}">Окрыть решение</a>
+"""
             else:  # если не решена
                 solution.is_checked = True  # проверена
                 solution.is_solved = False  # не решена
+                notification.title = "Решение проверено(не зачтено)"
+                notification.content = f"""
+Решение не зачтено для задачи "{task.title}" в уроке "{task.lesson.title}"<br>
+<a href="/lessons/{task.lesson.id}/tasks/{task.id}">Окрыть решение</a>
+"""
+            db_sess.add(notification)
             db_sess.commit()
             return redirect('/check_solutions')
         return render_template('check_solution.html', solution=solution, student=student, task=task, examples=examples,
@@ -821,6 +845,7 @@ def profile():
             students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split())).all()
         return render_template('profile.html', user=current_user, students=students, table_now=table_now)
     return render_template('profile.html', user=current_user, table_now=table_now)
+
 
 @app.route('/about_us')
 def about_us():

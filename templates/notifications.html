@@ -19,7 +19,7 @@
         <div class="col">
             <div class="container w-90">
                 <h5>{{ notification.title }}</h5>{% if notification.is_read %}(Прочитано){% endif %}
-                <p class="text-start fs-6">{{ notification.content }}</p>
+                <p class="text-start fs-6">{{ notification.content | safe }}</p>
                 <p class="text-end fs-6">{{ notification.created_at.strftime("%H:%M:%S %d-%m-%Y") }}</p>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 {% if not notification.is_read %}

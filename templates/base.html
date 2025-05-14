@@ -57,7 +57,9 @@
         <a href="/"><img src="{{url_for('static', filename='edinpy.png')}}"/></a>
         <a href="/" type="button" class="btn main_page">Главная</a>
         <a href="/lessons" type="button" class="btn lessons">Уроки</a>
+        {% if current_user.is_authenticated and current_user.get_type() == "teacher" %}
         <a href="/check_solutions" type="button" class="btn solutions">Проверка решений</a>
+        {% endif %}
         <a href="/rating" type="button" class="btn rating">Рейтинг</a>
         {% if current_user.is_authenticated %}
         {% if current_user.get_type() in ["student", "teacher"] %}
