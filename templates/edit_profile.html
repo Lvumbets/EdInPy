@@ -7,12 +7,15 @@
         .d {
             margin-left: 39%;
         }
+        img {
+            margin: 0rem 4rem;
+        }
 </style>
 <h1>Изменение профиля</h1><br>
 <div class="card d mx-auto" style="width: 18rem;">
     {% if current_user.image_name %}
-    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=135px height=200px
-         alt="Не удалось получить изображение" style="margin-left:25%">
+    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=auto height=auto
+         alt="Не удалось получить изображение">
     {% endif %}
     <form class="upload_form" action="" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}

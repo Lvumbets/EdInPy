@@ -815,15 +815,12 @@ def notifications_read(notification_id):
 @app.route('/profile')
 @login_required
 def profile():
-    is_teacher = current_user.__class__ == Teacher
-    if is_teacher:  # если авторизован учитель => получаем id его учеников и находим их
+    table_now = current_user.__class__.__name__
+    if table_now == 'Teacher':  # если авторизован учитель => получаем id его учеников и находим их
         with db_session.create_session() as db_sess:
             students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split())).all()
-            return render_template('profile.html', user=current_user, is_teacher=is_teacher, lst=students)
-    is_admin = current_user.__class__ == Admin
-    if is_admin:
-        return render_template('profile.html', user=current_user, is_admin=is_admin)
-
+        return render_template('profile.html', user=current_user, students=students, table_now=table_now)
+    return render_template('profile.html', user=current_user, table_now=table_now)
 
 @app.route('/about_us')
 def about_us():
@@ -837,16 +834,18 @@ def profile_edit():
     """Функция загрузки изменения профиля"""
     form = ProfileImageAdd()  # форма добавления изображения
     if form.validate_on_submit():  # если нажата кнопка submit
-        ext = form.image.data.filename.rsplit('.', 1)[1].lower()
-        filename = f'{str(uuid.uuid4())}.{ext}'
         with db_session.create_session() as db_sess:
             user = db_sess.query(current_user.__class__).filter(current_user.id == current_user.__class__.id).first()
-            user.image_name = filename
+            if form.image.data:
+                ext = form.image.data.filename.rsplit('.', 1)[1].lower()
+                filename = f'{str(uuid.uuid4())}.{ext}'
+                user.image_name = filename
+                form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
+
             user.name = form.name.data
             user.surname = form.surname.data
             user.age = form.age.data
             db_sess.commit()
-            form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename)))
         return redirect(f'/profile')
     form.name.data = current_user.name
     form.surname.data = current_user.surname

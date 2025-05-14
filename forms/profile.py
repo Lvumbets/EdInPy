@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileRequired
 
 class ProfileImageAdd(FlaskForm):
     """WTF форма для добавления изображения профиля"""
-    image = FileField('Изображение', validators=[FileRequired()])
+    image = FileField('Изображение')
     name = StringField('Имя')
     surname = StringField('Фамилия')
     age = IntegerField("Возраст")
