@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block content %}
+<style>
+    h1.t {
+    width: 7em;
+    height: 3em;
+    margin-bottom: 5em;
+    margin-left: 0;
+    position:absolute;
+    left:0px;
+    }
+    .lb {
+        position:absolute;
+        bottom:5px;
+        left:5px;
+    }
+
+    .d {
+        margin-left: 39%;
+    }
+
+    .rb {
+        position:absolute;
+        bottom:5px;
+        right:5px;
+    }
+</style>
+<h1 style="margin-left: 0%">Профиль</h1>
+<div class="card d" style="width: 18rem;">
+    {% if current_user.image_name %}
+    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=auto height=auto
+         alt="Не удалось получить изображение" style="margin: 0rem 4rem">
+    {% endif %}
+    <div class="card-body">
+        <h4 class="card-title" style="text-align:center">{{ current_user.name }} {{ current_user.surname }}</h4>
+        <p class="card-text"><b>Возраст:</b> {{ current_user.age }}</p>
+        <p class="card-text"><b>Почта:</b> {{ current_user.email }}</p>
+        <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
+        <p></p>
+        {% if table_now == 'Student' %}
+        <p class="card-text"><b>Рейтинг:</b> {{ current_user.completed_tasks }}</p>
+        {% elif table_now == 'Teacher' %}
+        <p class="card-text"><b>Ваши ученики:</b> {{ lst|join(", ") }}</p>
+        <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Список учеников</a>
+        {% elif table_now == 'Admin' %}
+        <a type="button" class="btn btn-info" href="/codes">Коды доступа</a>
+        {% endif %}
+        <a type="button" class="btn btn-success" href="/profile/edit">Изменить профиль</a>
+    </div>
+</div>
+<a type="button" class="btn btn-info rb" href="/change_password">Сменить пароль</a>
+<a type="button" class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
+{% endblock %}

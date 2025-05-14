@@ -1,0 +1,52 @@
+h1 h2 h3 p {
+  font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+  text-align: center;
+}
+
+.task_condition {
+  margin: 0px, 40px;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+form.lessons {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 450px;
+    height: 3em;
+    background-color: #cccccc;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+}
+
+.task .lesson {
+    width: 20em;
+    height: 20em;
+    margin-right: 50px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+hr{
+    border: none;
+    background-color: black;
+    color: red;
+    height: 20px;
+}
+
+div.mycenter {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80%;
+    padding: 10px;
+}
