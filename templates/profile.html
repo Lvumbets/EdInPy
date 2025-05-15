@@ -36,13 +36,15 @@
         <p class="card-text"><b>Почта:</b> {{ current_user.email }}</p>
         <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
         <p></p>
-        {% if table_now == 'Student' %}
+        {% if current_user.__class__.__name__ == 'Student' %}
         <p class="card-text"><b>Рейтинг:</b> {{ current_user.completed_tasks }}</p>
-        {% elif table_now == 'Teacher' %}
-        <p class="card-text"><b>Ваши ученики:</b> {{ lst|join(", ") }}</p>
+        <p class="card-text"><b>Твой учитель:</b> {{ teacher.name }} {{ teacher.surname }}</p>
+        {% elif current_user.__class__.__name__ == 'Teacher' %}
+        <p class="card-text"><b>Ваши ученики:</b> {{ students|join(", ") }}</p>
         <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Список учеников</a>
-        {% elif table_now == 'Admin' %}
+        {% elif current_user.__class__.__name__ == 'Admin' %}
         <a type="button" class="btn btn-info" href="/codes">Коды доступа</a>
+        <p></p>
         {% endif %}
         <a type="button" class="btn btn-success" href="/profile/edit">Изменить профиль</a>
     </div>

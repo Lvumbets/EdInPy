@@ -39,7 +39,7 @@
         <div class="row">
             <div class="col text-center">
                 <a href="/books/{{ book.id }}" style="text-decoration: none"><h3>{{ book.title }}</h3></a>
-                {% if is_admin %}</br>
+                {% if current_user.__class__.__name__ == 'Admin' %}</br>
                 <a href="/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
                 <a href="/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
                 {% endif %}
@@ -52,7 +52,7 @@
         {% endfor %}
     </div>
     {% endif %}
-    {% if is_admin %}
+    {% if current_user.__class__.__name__ == 'Admin' %}
     <br>
     <a href="/lessons/{{ lesson.id }}/books/add" class="btn btn-success">Добавить учебник</a>
     {% endif %}
@@ -62,7 +62,7 @@
         <div class="task">
             <a href="/lessons/{{ lesson.id }}/tasks/{{ task.id }}" type="button" class="btn btn-outline-secondary task">{{
                 task.title }}</a>
-            {% if is_admin %}
+            {% if current_user.__class__.__name__ == 'Admin' %}
             <div class="task_buttons">
                 <a href="/lessons/{{ lesson.id }}/tasks/edit/{{ task.id }}" class="btn btn-warning">Изменить</a>
                 <a href="/lessons/{{ lesson.id }}/tasks/delete/{{ task.id }}" class="btn btn-danger">Удалить</a>
@@ -71,7 +71,7 @@
         </div>
         {% endfor %}
     </div>
-    {% if is_admin %}
+    {% if current_user.__class__.__name__ == 'Admin' %}
     <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success">Добавить задачу</a>
     {% endif %}
     <hr>

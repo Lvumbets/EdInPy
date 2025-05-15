@@ -1,12 +1,11 @@
 import datetime
 
 import sqlalchemy
-from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
 
-class StudentNotification(SqlAlchemyBase, SerializerMixin):
+class StudentNotification(SqlAlchemyBase):
     """SQL база данных уведомлений"""
     __tablename__ = 'student_notifications'
 

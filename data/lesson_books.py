@@ -1,11 +1,10 @@
 import sqlalchemy
 from sqlalchemy import orm
-from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
 
-class LessonBook(SqlAlchemyBase, SerializerMixin):
+class LessonBook(SqlAlchemyBase):
     """SQL база данных уроков"""
     __tablename__ = 'lesson_books'
 

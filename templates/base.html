@@ -57,12 +57,12 @@
         <a href="/"><img src="{{url_for('static', filename='edinpy.png')}}"/></a>
         <a href="/" type="button" class="btn main_page">Главная</a>
         <a href="/lessons" type="button" class="btn lessons">Уроки</a>
-        {% if current_user.is_authenticated and current_user.get_type() == "teacher" %}
+        {% if current_user.is_authenticated and current_user.__class__.__name__ == 'Teacher' %}
         <a href="/check_solutions" type="button" class="btn solutions">Проверка решений</a>
         {% endif %}
         <a href="/rating" type="button" class="btn rating">Рейтинг</a>
         {% if current_user.is_authenticated %}
-        {% if current_user.get_type() in ["student", "teacher"] %}
+        {% if current_user.__class__.__name__ in ['Student', 'Teacher'] %}
         {% if current_user.has_notifications() %}
         <a href="/notifications"><img src="{{ url_for('static', filename='bell_black.png') }}" width=32px
                                       height=32px></a>

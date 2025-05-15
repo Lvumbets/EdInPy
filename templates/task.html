@@ -30,12 +30,12 @@
                 {% for example in examples %}
                 <tr>
                     <td>
-                        {% for i in example[0].split(',') %}
+                        {% for i in example[0].split('^') %}
                         <p>{{i}}</p>
                         {% endfor %}
                     </td>
                     <td>
-                        {% for i in example[1].split(',') %}
+                        {% for i in example[1].split('^') %}
                         <p>{{i}}</p>
                         {% endfor %}
                     </td>
@@ -45,7 +45,7 @@
             </table>
         </div>
         <br/>
-        {% if current_user.get_type() == "student" %}
+        {% if current_user.__class__.__name__ == 'Student' %}
         <div>{{ form.code(cols=100, rows=10) }}</div>
         {% if is_checked %}
         <p>Задача проверена</p>
