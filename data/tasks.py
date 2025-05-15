@@ -1,10 +1,10 @@
 import sqlalchemy
 from sqlalchemy import orm
-# from sqlalchemy_serializer import SerializerMixin НЕКОННЕКТИТСЯ С GLITCH, В ОСТАЛЬНОМ ОСТАВИТЬ
+from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
 
-class Task(SqlAlchemyBase):  # SerializerMixin НЕ КОННЕКТИТСЯ С GLITCH, В ОСТАЛЬНОМ ДОБАВИТЬ
+class Task(SqlAlchemyBase, SerializerMixin):
     """SQL база данных задач"""
     __tablename__ = 'tasks'
 

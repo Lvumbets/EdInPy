@@ -955,12 +955,20 @@ def change_students():
 
             """Привязывание учеников к учителю"""
             try:
+                # удалить не выбранных учеников у учителя
+                students = db_sess.query(Student).filter(Student.teacher_id == teacher.id).all()
+                for student in students:
+                    student.teacher_id = None
+                    db_sess.commit()
+
+                # добавить выбранных учеников заново
                 if len(teacher.students.split()):
                     for student_id in teacher.students.split():
                         student = db_sess.query(Student).filter(Student.id == student_id).first()
                         if student:
                             student.teacher_id = teacher.id
                             db_sess.commit()
+
             except Exception:
                 return render_template('change_students.html', form=form, message='Данные введены неверно')
 
