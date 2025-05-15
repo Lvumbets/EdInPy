@@ -38,7 +38,7 @@
         <div class="lesson">
             <a href="/lessons/{{ lesson.id }}/tasks" type="button" class="btn btn-outline-secondary lesson"><h3><b>{{
                 lesson.title }}</b></h3>{{ lesson.description }}</a>
-            {% if is_admin %}
+            {% if current_user.__class__.__name__ == 'Admin' %}
             <div class="lesson_buttons">
                 <a href="/lessons/edit/{{ lesson.id }}" class="btn btn-warning">Изменить</a>
                 <a href="/lessons/delete/{{ lesson.id }}" class="btn btn-danger">Удалить</a>
@@ -47,7 +47,7 @@
         </div>
         {% endfor %}
     </div>
-    {% if is_admin %}
+    {% if current_user.__class__.__name__ == 'Admin' %}
     <a href="/lessons/add" class="btn btn-success">Добавить урок</a>
     {% endif %}
 </form>

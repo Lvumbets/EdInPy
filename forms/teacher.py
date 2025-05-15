@@ -26,10 +26,12 @@ class LoginTeacher(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
+
     submit = SubmitField('Войти')
 
 
 class ChangeStudents(FlaskForm):
     """WTF форма для изменения учеников учителя"""
     students = StringField('Ученики (напишите их id через пробел)')
+
     submit = SubmitField('Сохранить')

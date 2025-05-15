@@ -1,5 +1,4 @@
 import sqlalchemy
-from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
@@ -7,7 +6,7 @@ PARAGRAPH_TYPE_IMAGE = "image"
 PARAGRAPH_TYPE_TEXT = "text"
 
 
-class LessonBookParagraph(SqlAlchemyBase, SerializerMixin):
+class LessonBookParagraph(SqlAlchemyBase):
     """SQL база данных разделов урока"""
     __tablename__ = 'lesson_book_paragraphs'
 

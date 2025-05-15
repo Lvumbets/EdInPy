@@ -45,7 +45,7 @@
             </table>
         </div>
         <br/>
-        {% if current_user.get_type() == "student" %}
+        {% if current_user.__class__.__name__ == 'Student' %}
         <div>{{ form.code(cols=100, rows=10) }}</div>
         {% if is_checked %}
         <p>Задача проверена</p>

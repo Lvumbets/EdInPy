@@ -1,12 +1,11 @@
 import sqlalchemy
-from flask_login import UserMixin
 from sqlalchemy import orm
-from sqlalchemy_serializer import SerializerMixin
+# from sqlalchemy_serializer import SerializerMixin НЕКОННЕКТИТСЯ С GLITCH, В ОСТАЛЬНОМ ОСТАВИТЬ
 
 from .db_session import SqlAlchemyBase
 
 
-class Lesson(SqlAlchemyBase, SerializerMixin):
+class Lesson(SqlAlchemyBase):  # SerializerMixin НЕ КОННЕКТИТСЯ С GLITCH, В ОСТАЛЬНОМ ДОБАВИТЬ
     """SQL база данных уроков"""
     __tablename__ = 'lessons'
 

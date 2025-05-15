@@ -22,6 +22,8 @@ class RegisterAdmin(FlaskForm):
 class LoginAdmin(FlaskForm):
     """WTF форма для логина админов"""
     email = EmailField('Почта', validators=[DataRequired()])
+
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
+
     submit = SubmitField('Войти')

@@ -20,6 +20,8 @@ class RegisterStudent(FlaskForm):
 class LoginStudent(FlaskForm):
     """WTF форма для авторизации учеников"""
     email = EmailField('Почта', validators=[DataRequired()])
+
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
+
     submit = SubmitField('Войти')
