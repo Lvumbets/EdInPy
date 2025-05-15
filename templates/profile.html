@@ -38,6 +38,7 @@
         <p></p>
         {% if current_user.__class__.__name__ == 'Student' %}
         <p class="card-text"><b>Рейтинг:</b> {{ current_user.completed_tasks }}</p>
+        <p class="card-text"><b>Твой учитель:</b> {{ teacher.name }} {{ teacher.surname }}</p>
         {% elif current_user.__class__.__name__ == 'Teacher' %}
         <p class="card-text"><b>Ваши ученики:</b> {{ students|join(", ") }}</p>
         <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Список учеников</a>

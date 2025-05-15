@@ -897,6 +897,12 @@ def profile():
         with db_session.create_session() as db_sess:
             students = db_sess.query(Student).filter(Student.id.in_(str(current_user.students).split())).all()
         return render_template('profile.html', user=current_user, students=students)
+
+    elif current_user.__class__ == Student:
+        with db_session.create_session() as db_sess:
+            teacher = db_sess.query(Teacher).filter(Teacher.id == current_user.teacher_id).first()
+        return render_template('profile.html', user=current_user, teacher=teacher)
+
     return render_template('profile.html', user=current_user)
 
 
