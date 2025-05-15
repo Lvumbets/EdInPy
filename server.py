@@ -140,16 +140,16 @@ def register_teacher():
             teacher.set_password(form.password.data)  # установка пароля для учителя
             db_sess.add(teacher)  # добавление учителя в бд
 
-            """Добавление id учителя к карточкам выбранных учеников"""
+            """Привязывание учеников к учителю"""
             try:
-                if len(form.students.data.split()):
-                    for id in form.students.data.split():
-                        student = db_sess.query(Student).filter(Student.id == id).first()
+                if len(teacher.students.split()):
+                    for student_id in teacher.students.split():
+                        student = db_sess.query(Student).filter(Student.id == student_id).first()
                         if student:
                             student.teacher_id = teacher.id
+                            db_sess.commit()
             except Exception:
-                flash("Данные об учениках введены неверно")
-                return render_template('register_teacher.html', form=form)
+                return render_template('change_students.html', form=form, message='Данные введены неверно')
 
             db_sess.commit()  # сохранение изменений в бд
         return redirect('/login_teacher')  # перевод на авторизацию учителя
@@ -954,6 +954,7 @@ def change_students():
                         student = db_sess.query(Student).filter(Student.id == student_id).first()
                         if student:
                             student.teacher_id = teacher.id
+                            db_sess.commit()
             except Exception:
                 return render_template('change_students.html', form=form, message='Данные введены неверно')
 
