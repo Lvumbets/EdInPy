@@ -44,6 +44,7 @@
         <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Список учеников</a>
         {% elif current_user.__class__.__name__ == 'Admin' %}
         <a type="button" class="btn btn-info" href="/codes">Коды доступа</a>
+        <p></p>
         {% endif %}
         <a type="button" class="btn btn-success" href="/profile/edit">Изменить профиль</a>
     </div>

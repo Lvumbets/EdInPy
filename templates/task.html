@@ -30,12 +30,12 @@
                 {% for example in examples %}
                 <tr>
                     <td>
-                        {% for i in example[0].split(',') %}
+                        {% for i in example[0].split('^') %}
                         <p>{{i}}</p>
                         {% endfor %}
                     </td>
                     <td>
-                        {% for i in example[1].split(',') %}
+                        {% for i in example[1].split('^') %}
                         <p>{{i}}</p>
                         {% endfor %}
                     </td>
