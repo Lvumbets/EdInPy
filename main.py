@@ -934,6 +934,8 @@ def change_password():
 def remove_unused_uploaded_files():
     """Функция удаления неиспользуемых загруженных файлов"""
     path = os.path.join(app.config['UPLOAD_FOLDER'])
+    if not os.path.exists(path):
+        os.makedirs(path)
     uploaded_files = set([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
 
     used_images = set()
@@ -994,8 +996,8 @@ def bad_request(_):
     return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
-def main():
-    """Функция запуска сайта"""
+def init():
+    """Функция настроек для запуска сайта"""
     api.add_resource(lessons_resource.LessonsListResource, '/api/lessons')  # api для списка уроков
     api.add_resource(lessons_resource.LessonResource, '/api/lessons/<int:lesson_id>')  # api для конкретного урока
 
@@ -1009,9 +1011,9 @@ def main():
 
     remove_unused_uploaded_files()
 
-    app.run()
 
+init()
 
 if __name__ == '__main__':
     """Если был запущен этот файл"""
-    main()
+    app.run()
