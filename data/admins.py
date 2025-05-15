@@ -1,13 +1,11 @@
 import sqlalchemy
 from flask_login import UserMixin
-from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db_session import SqlAlchemyBase
-from static.config.users import USER_ADMIN
 
 
-class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Admin(SqlAlchemyBase, UserMixin):
     """SQL база данных для админов"""
     __tablename__ = "admins"
 
@@ -36,4 +34,4 @@ class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.hashed_password, password)
 
     def get_id(self):
-        return f"{self.id}|{USER_ADMIN}"
+        return f"{self.id}|admin"

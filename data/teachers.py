@@ -1,15 +1,13 @@
 import sqlalchemy
 from flask_login import UserMixin, current_user
 from sqlalchemy import orm
-from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .db_session import SqlAlchemyBase, create_session
 from .teacher_notifications import TeacherNotification
-from static.config.users import USER_TEACHER
 
 
-class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Teacher(SqlAlchemyBase, UserMixin):
     """SQL база данных для учителей"""
     __tablename__ = 'teachers'
 
@@ -46,4 +44,4 @@ class Teacher(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.hashed_password, password)
 
     def get_id(self):
-        return f"{self.id}|{USER_TEACHER}"
+        return f"{self.id}|teacher"

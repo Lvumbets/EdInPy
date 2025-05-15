@@ -3,7 +3,6 @@ from flask_login import UserMixin, current_user
 from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from static.config.users import USER_STUDENT
 from .db_session import SqlAlchemyBase, create_session
 from .student_notifications import StudentNotification
 
@@ -48,4 +47,4 @@ class Student(SqlAlchemyBase, UserMixin):
         return check_password_hash(self.hashed_password, password)
 
     def get_id(self):
-        return f"{self.id}|{USER_STUDENT}"
+        return f"{self.id}|student"
