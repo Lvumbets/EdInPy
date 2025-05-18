@@ -47,9 +47,9 @@
           <a href="/rating" type="button" class="btn rating">Рейтинг</a>
         </div>
         <div class="account">
+          {% if current_user.is_authenticated %}
           <div class="notifications">
-            {% if current_user.is_authenticated %} {% if
-            current_user.__class__.__name__ in ['Student', 'Teacher'] and
+            {% if current_user.__class__.__name__ in ['Student', 'Teacher'] and
             current_user.has_notifications() %}
 
             <a href="/notifications">
@@ -62,83 +62,75 @@
             {% endif %}
           </div>
 
-          <div class="profile">
-            <div class="profile_user">
-              <a href="/profile" class="btn"
-                ><h3>
-                  <b>{{ current_user.name[0] }}. {{ current_user.surname }}</b>
-                </h3></a
-              >
+          <div class="profile_user">
+            <a href="/profile" class="btn"
+              ><h3>
+                <b>{{ current_user.name[0] }}. {{ current_user.surname }}</b>
+              </h3></a
+            >
+          </div>
+
+          {% else %}
+          <div class="profile_no_user">
+            <div class="button_register">
+              <div class="dropdown">
+                <button
+                  class="btn btn-primary dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Зарегистрироваться
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li>
+                    <a class="dropdown-item" href="/register_student"
+                      >Как ученик</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/register_teacher"
+                      >Как учитель</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/register_admin"
+                      >Как администратор</a
+                    >
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            {% else %}
-            <div class="profile_no_user">
-              <div class="button_register">
-                <div class="dropdown">
-                  <button
-                    class="btn btn-primary dropdown-toggle"
-                    type="button"
-                    id="dropdownMenuButton1"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Зарегистрироваться
-                  </button>
-                  <ul
-                    class="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton1"
-                  >
-                    <li>
-                      <a class="dropdown-item" href="/register_student"
-                        >Как ученик</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="/register_teacher"
-                        >Как учитель</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="/register_admin"
-                        >Как администратор</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="button_login">
-                <div class="dropdown">
-                  <button
-                    class="btn btn-success dropdown-toggle"
-                    type="button"
-                    id="dropdownMenuButton2"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Войти
-                  </button>
-                  <ul
-                    class="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton2"
-                  >
-                    <li>
-                      <a class="dropdown-item" href="/login_student"
-                        >Как ученик</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="/login_teacher"
-                        >Как учитель</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="/login_admin"
-                        >Как администратор</a
-                      >
-                    </li>
-                  </ul>
-                </div>
+            <div class="button_login">
+              <div class="dropdown">
+                <button
+                  class="btn btn-success dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton2"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Войти
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                  <li>
+                    <a class="dropdown-item" href="/login_student"
+                      >Как ученик</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/login_teacher"
+                      >Как учитель</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/login_admin"
+                      >Как администратор</a
+                    >
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

@@ -70,7 +70,7 @@ div.notifications img {
   align-self: center;
 }
 
-@media screen and (max-width: 1176px) {
+@media screen and (max-width: 892px) {
   .account {
     order: 0;
   }
