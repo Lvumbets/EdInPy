@@ -1,54 +1,65 @@
 {% extends "base.html" %} {% block content %}
 <style>
-    h1 {
-        text-align: center;
-    }
-    div.lessons {
-        display: flex;
-        justify-content: center;
-        flex-direction: row;
-        flex-wrap: wrap;
+  div.lessons {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 
-    }
-    div.lesson {
-        display: flex;
-        align-items: end;
-        justify-content: center;
-        flex-direction: column;
-        margin: 20px 25px;
-    }
-    a.lesson {
-        width: 20em;
-        height: 10em;
-        font-weight: bold;
-    }
-    .lesson_buttons {
-        display: flex;
-        flex-direction: row;
-    }
-    .lesson_buttons a {
-        width: 10em;
-    }
+  div.lesson {
+    width: 20em;
+    height: 12em;
+    margin: 0px 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  a.lesson {
+    width: 20em;
+    height: 10em;
+    font-weight: bold;
+  }
+
+  .lesson_buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .lesson_buttons a {
+    width: 10em;
+  }
 </style>
 <form>
-    <h1>Уроки</h1>
-    <br/>
-    <div class="lessons">
-        {% for lesson in lessons %}
-        <div class="lesson">
-            <a href="/lessons/{{ lesson.id }}/tasks" type="button" class="btn btn-outline-secondary lesson"><h3><b>{{
-                lesson.title }}</b></h3>{{ lesson.description }}</a>
-            {% if current_user.__class__.__name__ == 'Admin' %}
-            <div class="lesson_buttons">
-                <a href="/lessons/edit/{{ lesson.id }}" class="btn btn-warning">Изменить</a>
-                <a href="/lessons/delete/{{ lesson.id }}" class="btn btn-danger">Удалить</a>
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
+  <h1>Уроки</h1>
+  <br />
+  <div class="lessons">
+    {% for lesson in lessons %}
+    <div class="lesson">
+      <a
+        href="/lessons/{{ lesson.id }}/tasks"
+        type="button"
+        class="btn btn-outline-secondary lesson"
+        ><h3><b>{{ lesson.title }}</b></h3>
+        {{ lesson.description }}</a
+      >
+      {% if current_user.__class__.__name__ == 'Admin' %}
+      <div class="lesson_buttons">
+        <a href="/lessons/edit/{{ lesson.id }}" class="btn btn-warning"
+          >Изменить</a
+        >
+        <a href="/lessons/delete/{{ lesson.id }}" class="btn btn-danger"
+          >Удалить</a
+        >
+      </div>
+      {% endif %}
     </div>
-    {% if current_user.__class__.__name__ == 'Admin' %}
-    <a href="/lessons/add" class="btn btn-success">Добавить урок</a>
-    {% endif %}
+    {% endfor %}
+  </div>
+  {% if current_user.__class__.__name__ == 'Admin' %}
+  <a href="/lessons/add" class="btn btn-success">Добавить урок</a>
+  {% endif %}
 </form>
 {% endblock %}

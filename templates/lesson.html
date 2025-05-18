@@ -1,79 +1,87 @@
 {% extends "base.html" %} {% block content %}
-<style>
-    h1 {
-        text-align: center;
-    }
-    div.tasks {
-        display: flex;
-        justify-content: center;
-        flex-direction: row;
-        flex-wrap: wrap;
+<link rel="stylesheet" href="../../static/css/style.css" />
+<link rel="stylesheet" href="../../static/css/base.css" />
+<link rel="stylesheet" href="../../static/css/lesson.css" />
 
-    }
-    div.task {
-        display: flex;
-        align-items: start;
-        justify-content: center;
-        flex-direction: column;
-        margin: 20px 25px;
-    }
-    a.task {
-        width: 20em;
-        height: 10em;
-        font-weight: bold;
-    }
-    .task_buttons {
-        display: flex;
-        flex-direction: row;
-    }
-    .task_buttons a {
-        width: 10em;
-    }
-</style>
 <form action="">
-    {% if lesson.books %}
-    <h1>Учебники</h1>
-    <div class="container w-50">
-        <hr>
-        {% for book in lesson.books %}
-        <div class="row">
-            <div class="col text-center">
-                <a href="/books/{{ book.id }}" style="text-decoration: none"><h3>{{ book.title }}</h3></a>
-                {% if current_user.__class__.__name__ == 'Admin' %}</br>
-                <a href="/books/edit/{{ book.id }}" class="btn btn-warning">Изменить</a>
-                <a href="/books/delete/{{ book.id }}" class="btn btn-danger">Удалить</a>
-                {% endif %}
-            </div>
-            <div class="col text-left">
-                <h4>{{ book.description }}</h4>
-            </div>
-        </div>
-        <hr>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% if current_user.__class__.__name__ == 'Admin' %}
-    <br>
-    <a href="/lessons/{{ lesson.id }}/books/add" class="btn btn-success">Добавить учебник</a>
-    {% endif %}
-    <h1>Задачи</h1>
-    <div class="tasks">
-        {% for task in tasks %}
-        <div class="task">
-            <a href="/lessons/{{ lesson.id }}/tasks/{{ task.id }}" type="button" class="btn btn-outline-secondary task">{{
-                task.title }}</a>
-            {% if current_user.__class__.__name__ == 'Admin' %}
-            <div class="task_buttons">
-                <a href="/lessons/{{ lesson.id }}/tasks/edit/{{ task.id }}" class="btn btn-warning">Изменить</a>
-                <a href="/lessons/{{ lesson.id }}/tasks/delete/{{ task.id }}" class="btn btn-danger">Удалить</a>
-            </div>
+  {% if lesson.books %}
+  <h1>Учебники</h1>
+  <div class="container w-50">
+    <hr />
+    <div class="books">
+      {% for book in lesson.books %}
+      <div class="row">
+        <div class="col text-center">
+          <a href="/books/{{ book.id }}" class="book_title"
+            ><h3>{{ book.title }}</h3></a
+          >
+          <br />
+          {% if current_user.__class__.__name__ == 'Admin' %}
+          <div class="admin_book_buttons">
+            <a href="/books/edit/{{ book.id }}" class="btn btn-warning"
+              >Изменить</a
+            >
+            <a href="/books/delete/{{ book.id }}" class="btn btn-danger"
+              >Удалить</a
+            >
             {% endif %}
+          </div>
+          <div class="col text-left">
+            <h4>{{ book.description }}</h4>
+          </div>
         </div>
-        {% endfor %}
+      </div>
     </div>
-    {% if current_user.__class__.__name__ == 'Admin' %}
-    <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success">Добавить задачу</a>
-    {% endif %}
-    <hr>
+    <hr />
+    {% endfor %}
+  </div>
+  {% endif %}
+  <br />
+
+  {% if current_user.__class__.__name__ == 'Admin' %}
+  <div class="admin_book_add">
+    <a href="/lessons/{{ lesson.id }}/books/add" class="btn btn-success"
+      >Добавить учебник</a
+    >
+  </div>
+  {% endif %}
+
+  <h1>Задачи</h1>
+  <div class="tasks">
+    {% for task in tasks %}
+    <div class="task">
+      <a
+        href="/lessons/{{ lesson.id }}/tasks/{{ task.id }}"
+        type="button"
+        class="btn btn-outline-secondary task"
+        >{{ task.title }}</a
+      >
+      {% if current_user.__class__.__name__ == 'Admin' %}
+      <div class="admin_task_buttons">
+        <a
+          href="/lessons/{{ lesson.id }}/tasks/edit/{{ task.id }}"
+          class="btn btn-warning"
+          >Изменить</a
+        >
+        <a
+          href="/lessons/{{ lesson.id }}/tasks/delete/{{ task.id }}"
+          class="btn btn-danger"
+          >Удалить</a
+        >
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if current_user.__class__.__name__ == 'Admin' %}
+  <div class="admin_task_add">
+    <a href="/lessons/{{ lesson.id }}/tasks/add" class="btn btn-success"
+      >Добавить задачу</a
+    >
+  </div>
+  {% endif %}
+
+  <hr />
 </form>
 {% endblock %}

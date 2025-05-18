@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <link
       rel="icon"
@@ -66,7 +66,7 @@
             <div class="profile_user">
               <a href="/profile" class="btn"
                 ><h3>
-                  <b>{{ current_user.name }} {{ current_user.surname }}</b>
+                  <b>{{ current_user.name[0] }}. {{ current_user.surname }}</b>
                 </h3></a
               >
             </div>
@@ -159,5 +159,11 @@
       </div>
     </header>
     <main role="main" class="container">{% block content %}{% endblock %}</main>
+    <div id="footer">
+      <div class="container ms-auto">
+        &copy; 2025 Education In Python
+        <a href="/about_us" class="btn about_us">О нас</a>
+      </div>
+    </div>
   </body>
 </html>

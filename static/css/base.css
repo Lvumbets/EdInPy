@@ -43,3 +43,22 @@ div.notifications img {
 .button_login {
   margin-left: 5px;
 }
+
+#footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  padding: 10px;
+  background: #d3d3d3;
+  color: #fff;
+  width: 100%;
+}
+
+@media screen and (max-width: 1176px) {
+  .account {
+    order: 0;
+  }
+  .nav_buttons {
+    order: 1;
+  }
+}
