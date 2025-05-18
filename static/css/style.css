@@ -42,10 +42,3 @@ hr{
     height: 20px;
 }
 
-div.mycenter {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 80%;
-    padding: 10px;
-}
