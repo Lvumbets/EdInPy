@@ -1,31 +1,43 @@
 {% extends "base.html" %} {% block content %}
 <style>
-        .b {
-            position:absolute;
-            left:5px;
-            bottom:5px;
-        .d {
-            margin-left: 39%;
-        }
-        img {
-            margin: 0rem 4rem;
-        }
+  .b {
+      position:absolute;
+      left:5px;
+      bottom:5px;
+  .d {
+      margin-left: 39%;
+  }
+  img {
+      margin: 0rem 4rem;
+  }
 </style>
-<h1>Изменение профиля</h1><br>
-<div class="card d mx-auto" style="width: 18rem;">
-    {% if current_user.image_name %}
-    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=auto height=auto
-         alt="Не удалось получить изображение">
-    {% endif %}
-    <form class="upload_form" action="" method="post" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="card-body">
-            <p> {{ form.image.label }}:<br>{{ form.image(class_="card-text") }}</p>
-            <p> {{ form.name.label }}:<br>{{ form.name(class_="card-text") }}</p>
-            <p> {{ form.surname.label }}:<br>{{ form.surname(class_="card-text") }}</p>
-            <p> {{ form.age.label }}:<br>{{ form.age(class_="card-text") }}</p>
-            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        </div>
-    </form>
+<h1>Изменение профиля</h1>
+<br />
+<div class="card d mx-auto" style="width: 18rem">
+  {% if current_user.image_name %}
+  <img
+    src="{{url_for('static', filename='upload/'+current_user.image_name)}}"
+    width="auto"
+    height="auto"
+    alt="Не удалось получить изображение"
+  />
+  {% endif %}
+  <form
+    class="upload_form"
+    action=""
+    method="post"
+    enctype="multipart/form-data"
+  >
+    {{ form.hidden_tag() }}
+    <div class="card-body">
+      <p>{{ form.image.label }}:<br />{{ form.image(class_="card-text") }}</p>
+      <p>{{ form.name.label }}:<br />{{ form.name(class_="card-text") }}</p>
+      <p>
+        {{ form.surname.label }}:<br />{{ form.surname(class_="card-text") }}
+      </p>
+      <p>{{ form.age.label }}:<br />{{ form.age(class_="card-text") }}</p>
+      <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    </div>
+  </form>
 </div>
 {% endblock %}

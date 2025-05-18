@@ -1,54 +1,91 @@
 {% extends "base.html" %} {% block content %}
 <style>
-    h1.t {
-    width: 7em;
-    height: 3em;
-    margin-bottom: 5em;
-    margin-left: 0;
-    position:absolute;
-    left:0px;
-    }
-    .lb {
-        position:absolute;
-        bottom:5px;
-        left:5px;
-    }
+  .card {
+    margin: 0px auto;
+    width: 18rem;
+  }
 
-    .d {
-        margin-left: 39%;
-    }
-
-    .rb {
-        position:absolute;
-        bottom:5px;
-        right:5px;
-    }
+  .card-title {
+    text-align: center;
+  }
 </style>
-<h1 style="margin-left: 0%">Профиль</h1>
-<div class="card d" style="width: 18rem;">
-    {% if current_user.image_name %}
-    <img src="{{url_for('static', filename='upload/'+current_user.image_name)}}" width=auto height=auto
-         alt="Не удалось получить изображение" style="margin: 0rem 4rem">
-    {% endif %}
-    <div class="card-body">
-        <h4 class="card-title" style="text-align:center">{{ current_user.name }} {{ current_user.surname }}</h4>
-        <p class="card-text"><b>Возраст:</b> {{ current_user.age }}</p>
-        <p class="card-text"><b>Почта:</b> {{ current_user.email }}</p>
-        <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
-        <p></p>
-        {% if current_user.__class__.__name__ == 'Student' %}
-        <p class="card-text"><b>Рейтинг:</b> {{ current_user.completed_tasks }}</p>
-        <p class="card-text"><b>Твой учитель:</b> {{ teacher.name }} {{ teacher.surname }}</p>
-        {% elif current_user.__class__.__name__ == 'Teacher' %}
-        <p class="card-text"><b>Ваши ученики:</b> {{ students|join(", ") }}</p>
-        <a type="button" class="btn btn-info" style="margin-bottom: 1em;" href="/change_students">Список учеников</a>
-        {% elif current_user.__class__.__name__ == 'Admin' %}
-        <a type="button" class="btn btn-info" href="/codes">Коды доступа</a>
-        <p></p>
-        {% endif %}
-        <a type="button" class="btn btn-success" href="/profile/edit">Изменить профиль</a>
+
+<h1 class="profile_title">Профиль</h1>
+<div class="card">
+  {% if current_user.image_name %}
+  <div class="profile_image">
+    <img
+      src="{{url_for('static', filename='upload/'+current_user.image_name)}}"
+      width="50%"
+      height="auto"
+      alt="Не удалось получить изображение"
+      style="margin: 0rem 4rem"
+    />
+  </div>
+  {% endif %}
+  <div class="card-body">
+    <div class="card-title">
+      <h4>{{ current_user.name }} {{ current_user.surname }}</h4>
     </div>
+
+    <div class="profile_old">
+      <p class="card-text"><b>Возраст:</b> {{ current_user.age }}</p>
+    </div>
+
+    <div class="profile_mail">
+      <p class="card-text"><b>Почта:</b> {{ current_user.email }}</p>
+    </div>
+
+    <div class="profile_id">
+      <p class="card-text"><b>Ваш id:</b> {{ current_user.id }}</p>
+    </div>
+
+    <hr />
+
+    {% if current_user.__class__.__name__ == 'Student' %}
+    <div class="profile_ratin">
+      <p class="card-text">
+        <b>Рейтинг:</b> {{ current_user.completed_tasks }}
+      </p>
+    </div>
+
+    <div class="profile_student's_teacher">
+      <p class="card-text">
+        <b>Твой учитель:</b> {{ teacher.name }} {{ teacher.surname }}
+      </p>
+    </div>
+
+    {% elif current_user.__class__.__name__ == 'Teacher' %}
+    <div class="profile_teacher's_students">
+      <p class="card-text"><b>Ваши ученики:</b> {{ students|join(", ") }}</p>
+      <a
+        type="button"
+        class="btn btn-info"
+        style="margin-bottom: 1em"
+        href="/change_students"
+        >Список учеников</a
+      >
+    </div>
+
+    {% elif current_user.__class__.__name__ == 'Admin' %}
+    <div class="profile_codes_access">
+      <a type="button" class="btn btn-info" href="/codes">Коды доступа</a>
+    </div>
+    {% endif %}
+    <div class="profile_buttons">
+      <a type="button" class="btn btn-success" href="/profile/edit"
+        >Изменить профиль</a
+      >
+      <p></p>
+      <a type="button" class="btn btn-warning" href="/change_password"
+        >Сменить пароль</a
+      >
+      <p></p>
+      <a type="button" class="btn btn-danger" href="/logout"
+        >Выйти из аккаунта</a
+      >
+    </div>
+  </div>
 </div>
-<a type="button" class="btn btn-info rb" href="/change_password">Сменить пароль</a>
-<a type="button" class="btn btn-danger lb" href="/logout">Выйти из аккаунта</a>
+
 {% endblock %}

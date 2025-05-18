@@ -1,5 +1,9 @@
+nav {
+  background-color: rgb(245, 245, 245);
+}
 .logo {
   align-self: flex-start;
+  background-color: rgb(245, 245, 245);
 }
 
 div.nav_buttons {
@@ -26,6 +30,7 @@ div.notifications {
 
 div.notifications img {
   width: 100%;
+  background-color: rgb(245, 245, 245);
 }
 
 .account {
@@ -49,9 +54,20 @@ div.notifications img {
   left: 0;
   bottom: 0;
   padding: 10px;
-  background: #d3d3d3;
-  color: #fff;
+  background: rgb(230, 230, 230);
+  color: black;
   width: 100%;
+}
+
+#footer .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+#footer .container p {
+  margin: 0;
+  align-self: center;
 }
 
 @media screen and (max-width: 1176px) {

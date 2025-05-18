@@ -1,54 +1,65 @@
-{% extends "base.html" %} {% block content %}
-{% if users %}
-<h1 style="text-align: center;">Рейтинг учеников</h1>
-<div class="container w-90 text-center" style="background: rgb(230, 230, 230);">
-    <div class="row">
-        <div class="col">
-            <h3>Ученик</h3>
-            <p><b>(Имя|Фамилия)</b></p>
-        </div>
-        <div class="col">
-            <h3>Рейтинг</h3>
-            <p><b>(кол-во решённых задач)</b></p>
-        </div>
+{% extends "base.html" %} {% block content %} {% if users %}
+<style>
+    .container {
+        background: rgb(230, 230, 230);
+        padding: 10px;
+    }
+    .pagination {
+        margin: 0;
+    }
+</style>
+
+<h1>Рейтинг учеников</h1>
+<div class="container w-90 text-center">
+  <div class="row">
+    <div class="col">
+      <h3>Ученик</h3>
+      <p><b>(Имя|Фамилия)</b></p>
     </div>
-    {% for user in users %}
-    <div class="row">
-        <div class="col">
-            <h5>{{ user.name }} {{ user.surname }}</h5>
-        </div>
-        <div class="col">
-            <h4>{{ user.completed_tasks }}</h4>
-        </div>
+    <div class="col">
+      <h3>Рейтинг</h3>
+      <p><b>(кол-во решённых задач)</b></p>
     </div>
-    {% endfor %}
-    <div class="d-flex justify-content-center">
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                <li class="page-item">
-                    <a class="page-link {{ 'disabled' if not prev_page.enabled }}"
-                       href="{{ prev_page.link }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% for page in pages %}
-                <li class="page-item {{ 'disabled' if not page.enabled }}">
-                    <a class="page-link" href="{{ page.link }}">{{page.name }}</a>
-                </li>
-                {% endfor %}
-                <li class="page-item {{ 'disabled' if not next_page.enabled }}">
-                    <a class="page-link" href="{{ next_page.link }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+  </div>
+  {% for user in users %}
+  <div class="row">
+    <div class="col">
+      <h5>{{ user.name }} {{ user.surname }}</h5>
     </div>
+    <div class="col">
+      <h4>{{ user.completed_tasks }}</h4>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item">
+          <a
+            class="page-link {{ 'disabled' if not prev_page.enabled }}"
+            href="{{ prev_page.link }}"
+            aria-label="Previous"
+          >
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% for page in pages %}
+        <li class="page-item {{ 'disabled' if not page.enabled }}">
+          <a href="{{ page.link }}" class="page-link">{{page.name }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not next_page.enabled }}">
+          <a href="{{ next_page.link }}" class="page-link" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </div>
 
 {% else %}
 <div class="container mx-auto">
-    <p class="fs-3 text-center">Еще ни один ученик не зарегистрировался</p>
+  <p class="fs-3 text-center">Еще ни один ученик не зарегистрировался</p>
 </div>
-{% endif %}
-{% endblock %}
+{% endif %} {% endblock %}

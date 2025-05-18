@@ -1,0 +1,33 @@
+div.tasks {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+div.task {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-direction: column;
+  margin: 20px 25px;
+}
+
+a.task {
+  width: 20em;
+  height: 10em;
+  font-weight: bold;
+}
+
+.admin_task_buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.admin_task_buttons a {
+  width: 10em;
+}
+
+a.book_title {
+  text-decoration: none;
+}
