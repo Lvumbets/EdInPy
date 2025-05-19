@@ -1,18 +1,4 @@
 {% extends "base.html" %} {% block content %}
-<style>
-  table {
-    width: 300px;
-    border-collapse: collapse;
-  }
-  td,
-  th {
-    padding: 3px;
-    border: 1px solid black;
-  }
-  th {
-    background: #b0e0e6;
-  }
-</style>
 <link rel="stylesheet" href="../../../static/css/style.css" />
 <link rel="stylesheet" href="../../../static/css/base.css" />
 <form action="" method="post">
@@ -47,7 +33,7 @@
     </div>
     <br />
     {% if current_user.__class__.__name__ == 'Student' %}
-    <div>{{ form.code(cols=100, rows=10) }}</div>
+    <div>{{ form.code(cols=40, rows=10) }}</div>
     {% if is_checked %}
     <p>Задача проверена</p>
     {% if is_solved %}

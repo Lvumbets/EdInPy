@@ -1,13 +1,14 @@
 {% extends "base.html" %} {% block content %}
 <h1>{{ book.title }}</h1>
-{% if book.paragraphs %}
-{% for paragraph in book.paragraphs %}
-{% if paragraph.type == PARAGRAPH_TYPE_TEXT %}
-{{ paragraph.content | safe}}
-{% elif paragraph.type == PARAGRAPH_TYPE_IMAGE %}
-<img src="/static/upload/{{ paragraph.content }}"/>
-{% endif %}
-<br>
-{% endfor %}
-{% endif %}
+<div class="books_paragraphs">
+  {% if book.paragraphs %} {% for paragraph in book.paragraphs %}
+  <div class="book_paragraph">
+    {% if paragraph.type == PARAGRAPH_TYPE_TEXT %} {{ paragraph.content | safe}}
+    {% elif paragraph.type == PARAGRAPH_TYPE_IMAGE %}
+    <img src="/static/upload/{{ paragraph.content }}" />
+    {% endif %}
+  </div>
+  <br />
+  {% endfor %} {% endif %}
+</div>
 {% endblock %}

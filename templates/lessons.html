@@ -1,38 +1,6 @@
 {% extends "base.html" %} {% block content %}
-<style>
-  div.lessons {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  div.lesson {
-    width: 20em;
-    height: 12em;
-    margin: 0px 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  a.lesson {
-    width: 20em;
-    height: 10em;
-    font-weight: bold;
-  }
-
-  .lesson_buttons {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .lesson_buttons a {
-    width: 10em;
-  }
-</style>
-<form>
+<link rel="stylesheet" href="../static/css/lessons.css" />
+<form action="">
   <h1>Уроки</h1>
   <br />
   <div class="lessons">

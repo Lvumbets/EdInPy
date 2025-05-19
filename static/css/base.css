@@ -35,6 +35,7 @@ div.notifications img {
 
 .account {
   display: flex;
+  justify-content: end;
 }
 
 .profile_no_user {
@@ -73,7 +74,48 @@ div.notifications img {
 @media screen and (max-width: 892px) {
   .account {
     order: 0;
+    margin-right: 10px;
   }
+
+  .nav_buttons {
+    order: 1;
+  }
+
+  .profile_no_user {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap;
+    width: 40%;
+  }
+
+  .button_register {
+    margin-right: 0px;
+    margin-bottom: 10px;
+  }
+
+  .button_login {
+    margin-left: 0px;
+    margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .logo {
+    width: 50px;
+  }
+
+  nav.navbar {
+    flex-wrap: wrap;
+  }
+
+  .account {
+    order: 0;
+  }
+
+  .notifications {
+    margin: 0 10px;
+  }
+
   .nav_buttons {
     order: 1;
   }
