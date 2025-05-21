@@ -1,6 +1,7 @@
 nav {
   background-color: rgb(245, 245, 245);
 }
+
 .logo {
   align-self: flex-start;
   background-color: rgb(245, 245, 245);
@@ -13,10 +14,10 @@ div.nav_buttons {
   flex-wrap: wrap;
 }
 
-nav > div.nav_buttons a.main_page,
-nav > div.nav_buttons a.lessons,
-nav > div.nav_buttons a.solutions,
-nav > div.nav_buttons a.rating {
+nav>div.nav_buttons a.main_page,
+nav>div.nav_buttons a.lessons,
+nav>div.nav_buttons a.solutions,
+nav>div.nav_buttons a.rating {
   width: 7em;
   height: 2em;
   font-size: 150%;
@@ -71,7 +72,11 @@ div.notifications img {
   align-self: center;
 }
 
-@media screen and (max-width: 892px) {
+@media screen and (max-width: 895px) {
+  h1 {
+    font-size: x-large;
+  }
+
   .account {
     order: 0;
     margin-right: 10px;
